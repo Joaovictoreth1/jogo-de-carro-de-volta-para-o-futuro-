@@ -3,164 +3,516 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sunset Race - DeLorean Time Machine Edition</title>
-    <meta name="description" content="A derradeira evolução Synthwave. Alcance as 88 MPH no icónico DeLorean com modo Hover.">12
+    <title>Sunset Race - DeLorean Time Machine 88 MPH</title>
+    <meta name="description" content="A derradeira experiência Synthwave 3D. Alcance as 88 MPH no icónico DeLorean com modo Hover, trilha sonora procedural e viagens no tempo.">
     
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=VT323&display=swap');das
+    <!-- Fontes Futuristas & Arcade -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=VT323&display=swap" rel="stylesheet">
 
+    <style>
         :root {
             --neon-pink: #ff00ff;
             --neon-blue: #00ffff;
             --neon-orange: #ffaa00;
+            --neon-green: #00ff88;
             --dark-bg: #02000a;
+            --glass-bg: rgba(4, 2, 16, 0.72);
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body, html {
-            margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
-            background-color: var(--dark-bg); font-family: 'Orbitron', sans-serif;
-            touch-action: none; user-select: none; -webkit-user-select: none;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: var(--dark-bg);
+            font-family: 'Orbitron', sans-serif;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
-        #game-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
+        #game-container {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+        }
 
+        /* Vinheta cinematográfica */
         #vignette {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle, rgba(0,0,0,0) 40%, rgba(0,0,0,0.8) 100%);
-            z-index: 5; pointer-events: none;
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle, rgba(0,0,0,0) 45%, rgba(0,0,0,0.85) 100%);
+            z-index: 5;
+            pointer-events: none;
         }
 
+        /* Efeito CRT Scanlines sutil e otimizado */
         #crt-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
-                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            background-size: 100% 4px, 3px 100%;
-            z-index: 10; pointer-events: none; opacity: 0.6;
-            animation: flicker 0.15s infinite;
-        }
-        @keyframes flicker {
-            0% { opacity: 0.55; } 50% { opacity: 0.65; } 100% { opacity: 0.55; }
+            position: absolute;
+            inset: 0;
+            background: 
+                linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.22) 50%),
+                linear-gradient(90deg, rgba(255, 0, 0, 0.04), rgba(0, 255, 0, 0.015), rgba(0, 0, 255, 0.04));
+            background-size: 100% 4px, 4px 100%;
+            z-index: 10;
+            pointer-events: none;
+            opacity: 0.55;
         }
 
+        /* Flash branco de salto temporal */
         #time-flash {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: #fff; z-index: 15; opacity: 0; pointer-events: none;
-            transition: opacity 0.1s;
+            position: absolute;
+            inset: 0;
+            background-color: #ffffff;
+            z-index: 15;
+            opacity: 0;
+            pointer-events: none;
         }
 
+        /* Camada de Interface (HUD) */
         #ui-layer {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 20; display: flex; flex-direction: column; justify-content: space-between; pointer-events: none;
-            padding: 2vh 2vw; box-sizing: border-box;
+            position: absolute;
+            inset: 0;
+            z-index: 20;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            pointer-events: none;
+            padding: 18px 22px;
+        }
+
+        .hud-top, .hud-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            width: 100%;
+            gap: 12px;
+        }
+
+        .hud-bottom {
+            align-items: flex-end;
         }
 
         .hud-panel {
-            background: rgba(2, 0, 10, 0.6); border: 2px solid var(--neon-blue);
-            box-shadow: 0 0 10px var(--neon-blue) inset, 0 0 15px rgba(0,255,255,0.5);
-            border-radius: 8px; padding: 15px 25px; backdrop-filter: blur(5px);
-            display: flex; gap: 30px; align-items: center;
+            background: var(--glass-bg);
+            border: 1.5px solid var(--neon-blue);
+            box-shadow: 0 0 12px rgba(0, 255, 255, 0.25) inset, 0 4px 20px rgba(0, 0, 0, 0.6);
+            border-radius: 10px;
+            padding: 10px 18px;
+            backdrop-filter: blur(8px);
+            display: flex;
+            gap: 22px;
+            align-items: center;
         }
 
-        .hud-top, .hud-bottom { display: flex; justify-content: space-between; width: 100%; }
-        
-        .hud-element { display: flex; flex-direction: column; }
-        .hud-label { font-size: 12px; color: var(--neon-blue); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 2px; opacity: 0.9; }
-        .hud-value { font-size: 32px; font-weight: 900; color: #fff; text-shadow: 0 0 10px #fff; font-family: 'VT323', monospace; letter-spacing: 2px; }
+        .hud-element {
+            display: flex;
+            flex-direction: column;
+        }
 
-        #score-display { color: var(--neon-pink); text-shadow: 0 0 10px var(--neon-pink), 0 0 20px var(--neon-pink); }
-        #speed-display { color: var(--neon-orange); text-shadow: 0 0 10px var(--neon-orange); min-width: 120px; text-align: right; }
-        
+        .hud-label {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--neon-blue);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 2px;
+            opacity: 0.85;
+        }
+
+        .hud-value {
+            font-size: 30px;
+            font-weight: 900;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+            font-family: 'VT323', monospace;
+            letter-spacing: 2px;
+            line-height: 1;
+        }
+
+        #score-display {
+            color: var(--neon-pink);
+            text-shadow: 0 0 10px var(--neon-pink), 0 0 20px rgba(255, 0, 255, 0.6);
+        }
+
+        #highscore-display {
+            color: var(--neon-green);
+            text-shadow: 0 0 8px rgba(0, 255, 136, 0.6);
+            font-size: 24px;
+        }
+
+        #speed-display {
+            color: var(--neon-orange);
+            text-shadow: 0 0 12px var(--neon-orange);
+            min-width: 110px;
+            text-align: right;
+        }
+
         #combo-display {
-            color: #fff; text-shadow: 0 0 10px var(--neon-pink), 0 0 20px var(--neon-pink);
-            font-size: 38px; font-weight: 900; transition: transform 0.1s;
+            color: #fff;
+            text-shadow: 0 0 10px var(--neon-pink), 0 0 20px var(--neon-pink);
+            font-size: 34px;
+            transition: transform 0.12s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .combo-active { transform: scale(1.4) rotate(5deg); color: #fff; }
 
-        #level-notification {
-            position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%);
-            font-size: 60px; font-weight: 900; color: #fff; letter-spacing: 10px;
-            text-shadow: 0 0 20px #fff, 0 0 50px var(--neon-blue);
-            opacity: 0; text-align: center; white-space: nowrap; pointer-events: none;
+        .combo-active {
+            transform: scale(1.35) rotate(-4deg);
+            color: var(--neon-orange) !important;
         }
-        .level-up-anim { animation: timeJumpPulse 2.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-        @keyframes timeJumpPulse { 
-            0% { transform: translate(-50%, -50%) scale(0) skew(20deg); opacity: 0; } 
-            15% { transform: translate(-50%, -50%) scale(1.2) skew(0); opacity: 1; text-shadow: 0 0 100px #fff; } 
-            80% { transform: translate(-50%, -50%) scale(1); opacity: 1; } 
-            100% { transform: translate(-50%, -50%) scale(3); opacity: 0; filter: blur(20px); } 
+
+        /* Botões rápidos no HUD (Som & Pausa) */
+        .hud-actions {
+            display: flex;
+            gap: 8px;
+            pointer-events: auto;
+        }
+
+        .icon-btn {
+            background: var(--glass-bg);
+            border: 1.5px solid rgba(0, 255, 255, 0.6);
+            color: #fff;
+            width: 42px;
+            height: 42px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 16px;
+            padding: 0;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+            transition: all 0.2s ease;
+        }
+
+        .icon-btn:hover {
+            background: var(--neon-blue);
+            color: #000;
+            transform: translateY(-2px);
+        }
+
+        /* Capacitor de Fluxo (Widget Ícone) */
+        .flux-container {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .flux-box {
+            width: 40px;
+            height: 48px;
+            background: #0a0a12;
+            border: 2px solid #444;
+            border-radius: 6px;
+            position: relative;
+            box-shadow: inset 0 0 10px #000;
+            overflow: hidden;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .flux-active {
+            border-color: var(--neon-blue);
+            box-shadow: inset 0 0 12px var(--neon-blue), 0 0 15px var(--neon-blue);
+        }
+
+        .flux-tube {
+            position: absolute;
+            background: #333;
+            border-radius: 4px;
+            transition: all 0.15s;
+        }
+
+        .flux-y { width: 4px; height: 16px; bottom: 50%; left: 50%; transform: translateX(-50%); }
+        .flux-l { width: 4px; height: 18px; top: 50%; right: 50%; transform-origin: top right; transform: rotate(120deg); }
+        .flux-r { width: 4px; height: 18px; top: 50%; left: 50%; transform-origin: top left; transform: rotate(-120deg); }
+
+        .flux-active .flux-tube {
+            background: #fff;
+            box-shadow: 0 0 8px var(--neon-blue), 0 0 16px #fff;
+            animation: fluxPulse 0.08s infinite alternate;
+        }
+
+        @keyframes fluxPulse {
+            from { opacity: 0.6; }
+            to { opacity: 1; }
+        }
+
+        /* Barra de Progresso do Overdrive */
+        .overdrive-bar-wrap {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            margin-top: 4px;
+            overflow: hidden;
+        }
+
+        #overdrive-bar {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--neon-blue), #fff);
+            box-shadow: 0 0 8px var(--neon-blue);
+            transition: width 0.05s linear;
+        }
+
+        /* Notificações Centrais */
+        #level-notification {
+            position: absolute;
+            top: 32%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: clamp(32px, 6vw, 68px);
+            font-weight: 900;
+            color: #fff;
+            letter-spacing: 8px;
+            text-shadow: 0 0 20px #fff, 0 0 50px var(--neon-blue);
+            opacity: 0;
+            text-align: center;
+            white-space: nowrap;
+            pointer-events: none;
+        }
+
+        .level-up-anim {
+            animation: timeJumpPulse 2.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes timeJumpPulse {
+            0% { transform: translate(-50%, -50%) scale(0.2) skew(15deg); opacity: 0; }
+            15% { transform: translate(-50%, -50%) scale(1.15) skew(0); opacity: 1; }
+            80% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(2.2); opacity: 0; filter: blur(12px); }
         }
 
         #overdrive-warning {
-            position: absolute; top: 20%; left: 50%; transform: translate(-50%, -50%);
-            color: #fff; font-size: 40px; font-weight: 900; letter-spacing: 8px;
-            text-shadow: 0 0 20px #ff3300, 0 0 40px #ff3300, 0 0 80px #ff3300;
-            opacity: 0; transition: opacity 0.2s; text-align: center; pointer-events: none;
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #fff;
+            font-size: clamp(20px, 4vw, 42px);
+            font-weight: 900;
+            letter-spacing: 6px;
+            text-shadow: 0 0 20px #ff3300, 0 0 40px #ff3300;
+            opacity: 0;
+            transition: opacity 0.2s;
+            text-align: center;
+            pointer-events: none;
+            white-space: nowrap;
         }
-        .overdrive-on { opacity: 1 !important; animation: overdrivePulse 0.05s infinite alternate; }
-        @keyframes overdrivePulse { from { transform: translate(-50%, -50%) scale(1); } to { transform: translate(-50%, -50%) scale(1.05); text-shadow: 0 0 30px var(--neon-blue), 0 0 60px #fff; } }
 
-        .flux-container { display: flex; align-items: center; gap: 15px; }
-        .flux-box {
-            width: 45px; height: 55px; background: #111; border: 3px solid #444; border-radius: 5px;
-            position: relative; box-shadow: inset 0 0 10px #000; overflow: hidden;
+        .overdrive-on {
+            opacity: 1 !important;
+            animation: overdrivePulse 0.08s infinite alternate;
         }
-        .flux-tube { position: absolute; background: #333; border-radius: 4px; box-shadow: 0 0 5px #000; transition: all 0.1s; }
-        .flux-y { width: 5px; height: 18px; bottom: 50%; left: 50%; transform-origin: bottom center; transform: translateX(-50%); }
-        .flux-l { width: 5px; height: 20px; top: 50%; right: 50%; transform-origin: top right; transform: rotate(120deg); }
-        .flux-r { width: 5px; height: 20px; top: 50%; left: 50%; transform-origin: top left; transform: rotate(-120deg); }
-        
-        .flux-active .flux-tube { background: #fff; box-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue); animation: fluxPulse 0.05s infinite alternate; }
-        @keyframes fluxPulse { from { opacity: 0.5; } to { opacity: 1; } }
 
+        @keyframes overdrivePulse {
+            from { transform: translate(-50%, -50%) scale(1); }
+            to { transform: translate(-50%, -50%) scale(1.04); text-shadow: 0 0 25px var(--neon-blue), 0 0 50px #fff; }
+        }
+
+        /* Ecrãs de Menu (Início, Pausa, Game Over) */
         .screen {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background: rgba(2, 0, 10, 0.85); pointer-events: auto; backdrop-filter: blur(10px);
-            transition: opacity 0.5s ease; z-index: 30;
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(2, 0, 12, 0.82);
+            pointer-events: auto;
+            backdrop-filter: blur(12px);
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+            z-index: 30;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
         }
 
         h1 {
-            font-size: 70px; margin: 0; color: #fff;
-            text-shadow: 0 0 15px var(--neon-blue), 0 0 30px var(--neon-blue), 0 0 60px var(--neon-blue);
-            text-transform: uppercase; text-align: center; letter-spacing: 5px;
-            animation: pulseText 2s infinite alternate; line-height: 1.1;
+            font-size: clamp(36px, 7vw, 76px);
+            margin: 0;
+            color: #fff;
+            text-shadow: 0 0 15px var(--neon-blue), 0 0 35px var(--neon-blue), 0 0 70px var(--neon-pink);
+            text-transform: uppercase;
+            letter-spacing: 6px;
+            line-height: 1.05;
         }
-        h2 { color: var(--neon-pink); text-shadow: 0 0 15px var(--neon-pink); margin-bottom: 40px; letter-spacing: 6px; font-weight: 900; text-transform: uppercase; }
-        @keyframes pulseText { from { text-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue); } to { text-shadow: 0 0 20px var(--neon-blue), 0 0 40px var(--neon-blue), 0 0 80px #fff; } }
 
-        button {
-            background: rgba(0, 255, 255, 0.1); border: 2px solid var(--neon-blue); color: #fff;
-            font-family: 'Orbitron', sans-serif; font-size: 24px; font-weight: 900; padding: 15px 50px;
-            cursor: pointer; text-transform: uppercase; letter-spacing: 3px;
-            box-shadow: 0 0 15px var(--neon-blue) inset, 0 0 20px rgba(0,255,255,0.5); 
-            transition: all 0.2s ease; border-radius: 5px;
+        h2 {
+            color: var(--neon-pink);
+            text-shadow: 0 0 15px var(--neon-pink);
+            margin: 10px 0 32px;
+            letter-spacing: 5px;
+            font-size: clamp(14px, 2.5vw, 22px);
+            font-weight: 800;
+            text-transform: uppercase;
         }
-        button:hover { background: var(--neon-blue); color: #000; box-shadow: 0 0 30px var(--neon-blue); transform: scale(1.05); }
 
-        .hidden { opacity: 0; pointer-events: none; }
-        .instruction { font-size: 14px; color: rgba(255,255,255,0.7); margin-top: 40px; text-transform: uppercase; letter-spacing: 1px; text-align: center; line-height: 1.6; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 8px; border: 1px solid #333; }
-        .highlight { color: var(--neon-pink); font-weight: bold; text-shadow: 0 0 5px var(--neon-pink); }
+        .primary-btn {
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.18), rgba(255, 0, 255, 0.18));
+            border: 2px solid var(--neon-blue);
+            color: #fff;
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(16px, 2.5vw, 22px);
+            font-weight: 900;
+            padding: 16px 46px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            box-shadow: 0 0 18px rgba(0, 255, 255, 0.4) inset, 0 0 25px rgba(0, 255, 255, 0.4);
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-radius: 8px;
+        }
 
-        #mobile-controls { position: absolute; bottom: 0; left: 0; width: 100%; height: 50%; display: flex; z-index: 25; padding: 20px; box-sizing: border-box; gap: 10px; pointer-events: none;}
+        .primary-btn:hover {
+            background: var(--neon-blue);
+            color: #02000a;
+            box-shadow: 0 0 35px var(--neon-blue);
+            transform: scale(1.06);
+        }
+
+        .primary-btn:active {
+            transform: scale(0.97);
+        }
+
+        .instruction-card {
+            font-size: clamp(11px, 1.6vw, 14px);
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 32px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            line-height: 1.8;
+            background: rgba(10, 5, 25, 0.75);
+            padding: 18px 28px;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            max-width: 560px;
+        }
+
+        .highlight {
+            color: var(--neon-pink);
+            font-weight: 800;
+            text-shadow: 0 0 6px rgba(255, 0, 255, 0.6);
+        }
+
+        .highlight-cyan {
+            color: var(--neon-blue);
+            font-weight: 800;
+            text-shadow: 0 0 6px rgba(0, 255, 255, 0.6);
+        }
+
+        /* Estatísticas do Fim de Jogo */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+            background: rgba(10, 5, 25, 0.8);
+            border: 1px solid rgba(255, 0, 255, 0.4);
+            border-radius: 12px;
+            padding: 18px 25px;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .stat-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-box span:first-child {
+            font-size: 10px;
+            color: var(--neon-blue);
+            letter-spacing: 1.5px;
+            margin-bottom: 4px;
+        }
+
+        .stat-box span:last-child {
+            font-family: 'VT323', monospace;
+            font-size: 28px;
+            color: #fff;
+            text-shadow: 0 0 8px #fff;
+        }
+
+        /* Controles Touch (Mobile) */
+        #mobile-controls {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 45%;
+            display: none;
+            z-index: 25;
+            padding: 16px;
+            gap: 10px;
+            pointer-events: none;
+        }
+
         @media (hover: none) and (pointer: coarse) {
-            #mobile-controls { pointer-events: auto; }
+            #mobile-controls {
+                display: flex;
+            }
         }
-        .touch-btn { flex: 1; height: 100%; border: 2px dashed rgba(255,255,255,0.2); border-radius: 15px; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 20px; color: rgba(255,255,255,0.3); font-size: 24px; pointer-events: auto; background: linear-gradient(to top, rgba(255,255,255,0.05), transparent); transition: background 0.1s; }
-        .touch-btn:active { background: linear-gradient(to top, rgba(0,255,255,0.2), transparent); border-color: var(--neon-blue); color: var(--neon-blue); }
-        .touch-jump { flex: 1.5; font-size: 32px; }
 
-        @media (max-width: 768px) { 
-            h1 { font-size: 35px; } h2 { font-size: 16px; margin-bottom: 30px; }
-            .hud-panel { padding: 10px 15px; gap: 15px; }
-            .hud-value { font-size: 22px; } .hud-label { font-size: 10px; }
-            #overdrive-warning { font-size: 20px; } #level-notification { font-size: 30px; }
-            button { font-size: 18px; padding: 12px 30px; }
-            .flux-box { width: 30px; height: 40px; }
-            .flux-y { height: 12px; } .flux-l, .flux-r { height: 14px; }
-            .instruction { font-size: 11px; }
+        .touch-btn {
+            flex: 1;
+            height: 100%;
+            border: 1.5px dashed rgba(255, 255, 255, 0.18);
+            border-radius: 14px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding-bottom: 18px;
+            color: rgba(255, 255, 255, 0.35);
+            font-size: 20px;
+            font-weight: 700;
+            pointer-events: auto;
+            background: linear-gradient(to top, rgba(0, 255, 255, 0.04), transparent);
+            transition: all 0.1s;
+        }
+
+        .touch-btn:active {
+            background: linear-gradient(to top, rgba(0, 255, 255, 0.22), transparent);
+            border-color: var(--neon-blue);
+            color: var(--neon-blue);
+        }
+
+        .touch-jump {
+            flex: 1.4;
+            font-size: 18px;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        @media (max-width: 768px) {
+            #ui-layer { padding: 12px; }
+            .hud-panel { padding: 8px 12px; gap: 12px; }
+            .hud-value { font-size: 22px; }
+            #highscore-display { font-size: 18px; }
+            .hud-label { font-size: 9px; letter-spacing: 1px; }
+            .flux-box { width: 28px; height: 36px; }
+            .flux-y { height: 11px; }
+            .flux-l, .flux-r { height: 13px; }
+            .stats-grid { grid-template-columns: 1fr; gap: 10px; }
         }
     </style>
 
+    <!-- Import Map para Three.js -->
     <script type="importmap">
         {
             "imports": {
@@ -175,74 +527,118 @@
     <div id="game-container"></div>
     <div id="vignette"></div>
     <div id="crt-overlay"></div>
-    <div id="time-flash"></div> 
+    <div id="time-flash"></div>
 
+    <!-- Controles Táteis para Telemóveis/Tablets -->
     <div id="mobile-controls">
         <div class="touch-btn" id="touch-left">◀</div>
         <div class="touch-btn touch-jump" id="touch-jump">HOVER<br>▲</div>
         <div class="touch-btn" id="touch-right">▶</div>
     </div>
 
+    <!-- HUD Principal -->
     <div id="ui-layer">
-        <div id="level-notification">2015</div>
+        <div id="level-notification">2015 ERA</div>
         <div id="overdrive-warning">TIME TRAVEL: 88 MPH!!</div>
-        
+
         <div class="hud-top">
             <div class="hud-panel">
                 <div class="hud-element">
                     <span class="hud-label">PONTUAÇÃO</span>
                     <span class="hud-value" id="score-display">000000</span>
                 </div>
-                <div class="hud-element" style="text-align: right; min-width: 60px;">
+                <div class="hud-element">
+                    <span class="hud-label">RECORDE</span>
+                    <span class="hud-value" id="highscore-display">000000</span>
+                </div>
+                <div class="hud-element" style="text-align: right; min-width: 55px;">
                     <span class="hud-label">COMBO</span>
                     <span class="hud-value" id="combo-display">x1</span>
                 </div>
             </div>
-            
-            <div class="hud-panel flux-container">
-                <div class="hud-element" style="text-align: right;">
-                    <span class="hud-label">FLUXO</span>
-                    <span class="hud-value" id="flux-status" style="color: #555; font-size: 20px;">STANDBY</span>
+
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div class="hud-panel flux-container">
+                    <div class="hud-element" style="text-align: right;">
+                        <span class="hud-label">CAPACITOR</span>
+                        <span class="hud-value" id="flux-status" style="color: #666; font-size: 18px;">STANDBY</span>
+                        <div class="overdrive-bar-wrap">
+                            <div id="overdrive-bar"></div>
+                        </div>
+                    </div>
+                    <div class="flux-box" id="flux-capacitor">
+                        <div class="flux-tube flux-y"></div>
+                        <div class="flux-tube flux-l"></div>
+                        <div class="flux-tube flux-r"></div>
+                    </div>
                 </div>
-                <div class="flux-box" id="flux-capacitor">
-                    <div class="flux-tube flux-y"></div>
-                    <div class="flux-tube flux-l"></div>
-                    <div class="flux-tube flux-r"></div>
+
+                <div class="hud-actions">
+                    <button class="icon-btn" id="mute-btn" title="Ativar/Desativar Som (M)">🔊</button>
+                    <button class="icon-btn" id="pause-btn" title="Pausar Jogo (P / ESC)">⏸</button>
                 </div>
             </div>
         </div>
-        
+
         <div class="hud-bottom">
             <div class="hud-panel">
                 <div class="hud-element">
-                    <span class="hud-label">ERA ATUAL</span>
+                    <span class="hud-label">DESTINO TEMPORAL</span>
                     <span class="hud-value" id="level-display" style="color: var(--neon-blue);">1985</span>
                 </div>
             </div>
             <div class="hud-panel">
                 <div class="hud-element">
-                    <span class="hud-label">VELOCIDADE</span>
+                    <span class="hud-label">VELOCÍMETRO</span>
                     <span class="hud-value" id="speed-display">00 MPH</span>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Ecrã Inicial -->
     <div id="start-screen" class="screen">
         <h1>Sunset Race</h1>
-        <h2>DeLorean Hover Edition</h2>
-        <button id="start-btn">INICIAR IGNIÇÃO</button>
-        <div class="instruction">
-            [A] / [D] ou [Setas] para <span class="highlight">Conduzir</span><br>
-            [ESPAÇO] ou [Tocar Centro] para <span class="highlight">Hover Mode (Saltar)</span><br>
-            Apanhe Pirâmides Laranja para ativar o <span style="color:#0ff">Capacitor de Fluxo</span>!
+        <h2>DeLorean Time Machine • 88 MPH</h2>
+        <button class="primary-btn" id="start-btn">INICIAR IGNIÇÃO</button>
+        <div class="instruction-card">
+            <span class="highlight">[A] / [D]</span> ou <span class="highlight">[Setas]</span> (ou deslizar) para Conduzir<br>
+            <span class="highlight">[ESPAÇO] / [W] / [▲]</span> para ativar o <span class="highlight-cyan">Modo Hover (Saltar)</span><br>
+            Apanhe Anéis para multiplicar o <span class="highlight">Combo</span> e Pirâmides Laranja para atingir <span class="highlight-cyan">88 MPH</span>!
         </div>
     </div>
 
+    <!-- Ecrã de Pausa -->
+    <div id="pause-screen" class="screen hidden">
+        <h1 style="font-size: clamp(32px, 6vw, 60px);">TEMPO SUSPENSO</h1>
+        <h2>Simulação em Pausa</h2>
+        <div style="display: flex; gap: 16px; flex-wrap: wrap; justify-content: center;">
+            <button class="primary-btn" id="resume-btn">RETOMAR</button>
+            <button class="primary-btn" id="pause-restart-btn" style="border-color: var(--neon-pink);">REINICIAR</button>
+        </div>
+    </div>
+
+    <!-- Ecrã de Game Over -->
     <div id="game-over-screen" class="screen hidden">
-        <h1 style="color: #fff; text-shadow: 0 0 20px #f00, 0 0 50px #f00;">FORA DO TEMPO</h1>
-        <h2 id="final-score" style="color: var(--neon-blue); text-shadow: 0 0 10px var(--neon-blue);">PONTOS: 0</h2>
-        <button id="restart-btn">NOVO SALTO</button>
+        <h1 style="color: #fff; text-shadow: 0 0 20px #ff0044, 0 0 50px #ff0044;">FORA DO TEMPO</h1>
+        <h2 id="new-record-badge" style="color: var(--neon-green); text-shadow: 0 0 12px var(--neon-green); display: none;">★ NOVO RECORDE TEMPORAL ★</h2>
+        
+        <div class="stats-grid">
+            <div class="stat-box">
+                <span>PONTUAÇÃO FINAL</span>
+                <span id="final-score">0</span>
+            </div>
+            <div class="stat-box">
+                <span>COMBO MÁXIMO</span>
+                <span id="final-combo">x1</span>
+            </div>
+            <div class="stat-box">
+                <span>SALTOS NO TEMPO</span>
+                <span id="final-jumps">0</span>
+            </div>
+        </div>
+
+        <button class="primary-btn" id="restart-btn">NOVO SALTO TEMPORAL</button>
     </div>
 
     <script type="module">
@@ -251,694 +647,1365 @@
         import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
         import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 
-        // --- SISTEMA DE ERAS (Viagem no tempo) ---
-        const themes = [
-            { name: "1985", sun: ['#ffaa00', '#ff0055', '#3300ff'], fog: 0x02000a, grid: 0xff00ff, acc: 0x00ffff, bld: 0x010005, p1: 0xff0055 },
-            { name: "2015", sun: ['#00ffff', '#0055ff', '#000033'], fog: 0x00051a, grid: 0x00ffff, acc: 0xff0055, bld: 0x000210, p1: 0x00ffff },
-            { name: "1955", sun: ['#ffdd00', '#ff5500', '#550000'], fog: 0x1a0500, grid: 0xffaa00, acc: 0xff3300, bld: 0x110200, p1: 0xffdd00 },
-            { name: "2077", sun: ['#aaffaa', '#00ffaa', '#003322'], fog: 0x001105, grid: 0x00ffaa, acc: 0xff00ff, bld: 0x001105, p1: 0xaaffaa },
-            { name: "1885", sun: ['#ffffff', '#aaaaaa', '#332211'], fog: 0x221105, grid: 0xffffff, acc: 0xffaa00, bld: 0x0a0500, p1: 0xffffff }
+        // ============================================================================
+        // 1. CONFIGURAÇÃO DE ERAS TEMPORAIS (Paletas de Cores & Atmosfera)
+        // ============================================================================
+        const ERAS = [
+            { name: "1985", label: "OUTRUN 1985", sun: ['#ffdd00', '#ff0066', '#2a0066'], fog: 0x050014, grid: 0xff00ff, acc: 0x00ffff, bld: 0x08001a },
+            { name: "2015", label: "FUTURE 2015", sun: ['#00ffff', '#0066ff', '#000833'], fog: 0x00081c, grid: 0x00ffff, acc: 0xff0077, bld: 0x000a24 },
+            { name: "1955", label: "CLASSIC 1955", sun: ['#ffee44', '#ff6600', '#440000'], fog: 0x180400, grid: 0xffaa00, acc: 0xff3300, bld: 0x1a0500 },
+            { name: "2077", label: "CYBER 2077",  sun: ['#aaffcc', '#00ff88', '#002218'], fog: 0x00120a, grid: 0x00ff88, acc: 0xff00ff, bld: 0x001a0e },
+            { name: "1885", label: "FRONTIER 1885",sun: ['#ffffff', '#ffbb66', '#331100'], fog: 0x1a0c04, grid: 0xffcc66, acc: 0x00ffff, bld: 0x140802 }
         ];
 
-        // --- ESTADO GLOBAL ---
+        // ============================================================================
+        // 2. ESTADO GLOBAL & FÍSICA
+        // ============================================================================
         let scene, camera, renderer, composer, bloomPass;
         let car, gridHelper, terrain, sunMesh, starfield, cityscape, timeTunnel;
-        let mainLight, lightningLight;
+        let lightningLight, carUnderGlow;
         let lightTrails = { left: [], right: [], geomL: null, geomR: null, mat: null };
-        
-        const entities = { obstacles: [], collectibles: [], particles: [], shockwaves: [], fireTrails: [] };
-        let activePools = { obstacles: [], collectibles: [], particles: [] };
-        
-        let gameActive = false, score = 0, currentLevel = 0, speed = 1.0;
-        const baseSpeed = 1.2, maxSpeedNormal = 8.0, speedOverdrive = 16.0;
-        
-        // Físicas 
-        let moveLeft = false, moveRight = false, carVelocityX = 0;
-        let isJumping = false, carVelocityY = 0;
-        const carAccel = 0.2, carFriction = 0.75, carMaxX = 14;
-        const gravity = 0.025, jumpStrength = 0.55;
-        
-        let invulnerableTimer = 0, isOverdrive = false, overdriveTimer = 0;
-        let comboMultiplier = 1, comboTimer = 0, screenShake = 0; 
 
-        // Elementos da UI
+        // Listas de entidades ativas e Object Pools (zero garbage collection em jogo)
+        const entities = { obstacles: [], collectibles: [], particles: [], shockwaves: [], fireTrails: [] };
+        const pools = { obstacles: [], collectibles: [], particles: [], fireTrails: [] };
+
+        let gameState = 'MENU'; // 'MENU', 'PLAYING', 'PAUSED', 'GAMEOVER'
+        let score = 0;
+        let highScore = parseInt(localStorage.getItem('sunset_delorean_highscore') || '0', 10);
+        let maxComboReached = 1;
+        let timeJumpsCount = 0;
+        let currentEraIndex = 0;
+
+        // Velocidades e Física (Normalizadas por Delta Time a 60 FPS)
+        let speed = 1.2;
+        const BASE_SPEED = 1.3;
+        const MAX_SPEED_NORMAL = 7.5;
+        const SPEED_OVERDRIVE = 15.5;
+
+        let moveLeft = false, moveRight = false;
+        let carVelocityX = 0;
+        let isJumping = false, carVelocityY = 0;
+        const CAR_ACCEL = 0.24;
+        const CAR_FRICTION = 0.78;
+        const CAR_MAX_X = 14.5;
+        const GRAVITY = 0.026;
+        const JUMP_STRENGTH = 0.58;
+
+        let invulnerableTimer = 0;
+        let isOverdrive = false;
+        let overdriveTimer = 0;
+        const OVERDRIVE_DURATION = 480; // ~8 segundos a 60fps
+
+        let comboMultiplier = 1;
+        let comboTimer = 0;
+        let screenShake = 0;
+        let spawnCooldownObs = 0;
+        let spawnCooldownCol = 0;
+
+        const clock = new THREE.Clock();
+
+        // Referências de UI
         const ui = {
-            score: document.getElementById('score-display'), level: document.getElementById('level-display'),
-            combo: document.getElementById('combo-display'), speed: document.getElementById('speed-display'),
-            overdrive: document.getElementById('overdrive-warning'), notification: document.getElementById('level-notification'),
-            flash: document.getElementById('time-flash'), fluxCap: document.getElementById('flux-capacitor'),
-            fluxStatus: document.getElementById('flux-status')
+            score: document.getElementById('score-display'),
+            highScore: document.getElementById('highscore-display'),
+            level: document.getElementById('level-display'),
+            combo: document.getElementById('combo-display'),
+            speed: document.getElementById('speed-display'),
+            overdrive: document.getElementById('overdrive-warning'),
+            overdriveBar: document.getElementById('overdrive-bar'),
+            notification: document.getElementById('level-notification'),
+            flash: document.getElementById('time-flash'),
+            fluxCap: document.getElementById('flux-capacitor'),
+            fluxStatus: document.getElementById('flux-status'),
+            muteBtn: document.getElementById('mute-btn'),
+            pauseBtn: document.getElementById('pause-btn')
         };
 
-        // Pré-alocar recursos para evitar vazamentos de memória
+        ui.highScore.innerText = highScore.toString().padStart(6, '0');
+
+        // Geometrias e Materiais Partilhados
         const sharedAssets = {
             obsGeo: new THREE.BoxGeometry(1, 1, 1),
-            obsMatSolid: new THREE.MeshStandardMaterial({ color: 0x111111, metalness:0.7, roughness:0.3 }),
-            obsMatWire: new THREE.MeshBasicMaterial({ wireframe: true, transparent: true, opacity: 0.9 }),
-            ringGeo: new THREE.TorusGeometry(1.5, 0.4, 8, 20),
-            ringMat: new THREE.MeshStandardMaterial({ color: 0x000, emissive: themes[0].acc, emissiveIntensity: 5 }),
-            boostGeo: new THREE.ConeGeometry(2.0, 4.0, 4),
-            boostMat: new THREE.MeshStandardMaterial({ color: 0x000, emissive: 0xff5500, emissiveIntensity: 6, wireframe: true }),
-            partGeo: new THREE.BoxGeometry(0.8, 0.8, 0.8),
+            obsMatSolid: new THREE.MeshStandardMaterial({ color: 0x0a0a10, metalness: 0.85, roughness: 0.2 }),
+            obsMatWire: new THREE.MeshBasicMaterial({ wireframe: true, transparent: true, opacity: 0.95 }),
+            ringGeo: new THREE.TorusGeometry(1.4, 0.32, 10, 24),
+            ringMat: new THREE.MeshStandardMaterial({ color: 0x000000, emissive: ERAS[0].acc, emissiveIntensity: 4.5 }),
+            boostGeo: new THREE.OctahedronGeometry(2.1, 0),
+            boostMat: new THREE.MeshStandardMaterial({ color: 0x000000, emissive: 0xff6600, emissiveIntensity: 6, wireframe: true }),
+            boostCoreMat: new THREE.MeshBasicMaterial({ color: 0xffcc00 }),
+            partGeo: new THREE.BoxGeometry(0.65, 0.65, 0.65),
             partMatCrash: new THREE.MeshBasicMaterial({ color: 0xffaa00 }),
             partMatBoost: new THREE.MeshBasicMaterial({ color: 0x00ffff }),
-            fireGeo: new THREE.PlaneGeometry(1.5, 8),
-            fireMat: new THREE.MeshBasicMaterial({ color: 0xff4400, transparent: true, opacity: 1, blending: THREE.AdditiveBlending })
+            fireGeo: new THREE.PlaneGeometry(1.1, 9),
+            fireMat: new THREE.MeshBasicMaterial({ color: 0xff5500, transparent: true, opacity: 0.95, blending: THREE.AdditiveBlending, depthWrite: false })
         };
 
-        // --- MOTOR DE ÁUDIO PROCEDURAL ---
-        let audioCtx, masterCompressor, engineOsc, hoverOsc, hoverGain, beatInterval, arpInterval;
-        const scale = [220, 261.63, 293.66, 329.63, 392.00, 440];
+        // ============================================================================
+        // 3. MOTOR DE ÁUDIO PROCEDURAL SYNTHWAVE (Web Audio API)
+        // ============================================================================
+        let audioCtx, masterGain, masterCompressor, engineOsc, engineGain, hoverOsc, hoverGain;
+        let musicTimer = null;
+        let isMuted = false;
+
+        // Progressão Synthwave Clássica (Am - F - C - G)
+        const BASS_NOTES = [110.00, 110.00, 87.31, 87.31, 130.81, 130.81, 98.00, 98.00];
+        const ARP_SCALE = [220.00, 261.63, 329.63, 392.00, 440.00, 523.25, 659.25];
 
         function initAudio() {
             if (audioCtx) return;
             const AudioContext = window.AudioContext || window.webkitAudioContext;
-            if(!AudioContext) return;
+            if (!AudioContext) return;
+
             audioCtx = new AudioContext();
+            masterGain = audioCtx.createGain();
+            masterGain.gain.value = isMuted ? 0 : 0.75;
+
             masterCompressor = audioCtx.createDynamicsCompressor();
-            masterCompressor.connect(audioCtx.destination);
-            
-            engineOsc = audioCtx.createOscillator(); engineOsc.type = 'sawtooth';
-            const filter = audioCtx.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.value = 250;
-            engineOsc.connect(filter); filter.connect(masterCompressor);
+            masterCompressor.threshold.value = -14;
+            masterCompressor.knee.value = 20;
+            masterCompressor.ratio.value = 6;
+            masterCompressor.connect(masterGain);
+            masterGain.connect(audioCtx.destination);
+
+            // Som contínuo do motor V6
+            engineOsc = audioCtx.createOscillator();
+            engineOsc.type = 'sawtooth';
+            engineOsc.frequency.value = 65;
+            const engineFilter = audioCtx.createBiquadFilter();
+            engineFilter.type = 'lowpass';
+            engineFilter.frequency.value = 220;
+            engineGain = audioCtx.createGain();
+            engineGain.gain.value = 0.14;
+            engineOsc.connect(engineFilter);
+            engineFilter.connect(engineGain);
+            engineGain.connect(masterCompressor);
             engineOsc.start();
 
-            hoverOsc = audioCtx.createOscillator(); hoverOsc.type = 'sine';
-            hoverGain = audioCtx.createGain(); hoverGain.gain.value = 0;
-            hoverOsc.connect(hoverGain); hoverGain.connect(masterCompressor);
+            // Som magnético do modo Hover
+            hoverOsc = audioCtx.createOscillator();
+            hoverOsc.type = 'sine';
+            hoverOsc.frequency.value = 180;
+            hoverGain = audioCtx.createGain();
+            hoverGain.gain.value = 0;
+            hoverOsc.connect(hoverGain);
+            hoverGain.connect(masterCompressor);
             hoverOsc.start();
         }
 
-        function playSfx(type) {
-            if (!audioCtx || audioCtx.state !== 'running') return;
-            const t = audioCtx.currentTime;
-            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-            osc.connect(gain); gain.connect(masterCompressor);
+        function toggleMute() {
+            isMuted = !isMuted;
+            ui.muteBtn.innerText = isMuted ? '🔇' : '🔊';
+            if (masterGain && audioCtx) {
+                masterGain.gain.setTargetAtTime(isMuted ? 0 : 0.75, audioCtx.currentTime, 0.05);
+            }
+        }
 
-            switch(type) {
+        function playSfx(type) {
+            if (!audioCtx || audioCtx.state !== 'running' || isMuted) return;
+            const t = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(masterCompressor);
+
+            switch (type) {
                 case 'coin':
-                    osc.type = 'sine'; osc.frequency.setValueAtTime(800 + (comboMultiplier * 150), t);
-                    osc.frequency.exponentialRampToValueAtTime(1600 + (comboMultiplier * 150), t + 0.1);
-                    gain.gain.setValueAtTime(0.3, t); gain.gain.exponentialRampToValueAtTime(0.01, t + 0.3);
-                    osc.start(t); osc.stop(t + 0.3);
+                    osc.type = 'triangle';
+                    const baseFreq = 750 + Math.min(comboMultiplier * 90, 1200);
+                    osc.frequency.setValueAtTime(baseFreq, t);
+                    osc.frequency.exponentialRampToValueAtTime(baseFreq * 1.5, t + 0.12);
+                    gain.gain.setValueAtTime(0.28, t);
+                    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.25);
+                    osc.start(t);
+                    osc.stop(t + 0.25);
                     break;
+
                 case 'jump':
-                    osc.type = 'triangle'; osc.frequency.setValueAtTime(150, t); osc.frequency.linearRampToValueAtTime(350, t + 0.3);
-                    gain.gain.setValueAtTime(0.3, t); gain.gain.linearRampToValueAtTime(0.01, t + 0.3);
-                    osc.start(t); osc.stop(t + 0.3);
-                    hoverOsc.frequency.setValueAtTime(250, t); hoverOsc.frequency.linearRampToValueAtTime(150, t + 0.5);
-                    hoverGain.gain.setTargetAtTime(0.3, t, 0.1);
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(140, t);
+                    osc.frequency.exponentialRampToValueAtTime(420, t + 0.28);
+                    gain.gain.setValueAtTime(0.22, t);
+                    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+                    osc.start(t);
+                    osc.stop(t + 0.3);
+
+                    if (hoverOsc && hoverGain) {
+                        hoverOsc.frequency.setValueAtTime(260, t);
+                        hoverOsc.frequency.linearRampToValueAtTime(170, t + 0.45);
+                        hoverGain.gain.setTargetAtTime(0.22, t, 0.05);
+                    }
                     break;
+
                 case 'land':
-                    hoverGain.gain.setTargetAtTime(0, t, 0.05);
-                    osc.type = 'square'; osc.frequency.setValueAtTime(80, t);
-                    gain.gain.setValueAtTime(0.3, t); gain.gain.exponentialRampToValueAtTime(0.01, t + 0.2);
-                    osc.start(t); osc.stop(t + 0.2);
+                    if (hoverGain) hoverGain.gain.setTargetAtTime(0, t, 0.04);
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(95, t);
+                    osc.frequency.exponentialRampToValueAtTime(35, t + 0.15);
+                    gain.gain.setValueAtTime(0.3, t);
+                    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+                    osc.start(t);
+                    osc.stop(t + 0.15);
                     break;
+
                 case 'time_travel':
-                    osc.type = 'sawtooth'; osc.frequency.setValueAtTime(50, t); osc.frequency.exponentialRampToValueAtTime(2500, t + 0.6);
-                    gain.gain.setValueAtTime(0.8, t); gain.gain.exponentialRampToValueAtTime(0.01, t + 2.0);
-                    osc.start(t); osc.stop(t + 2.0);
+                    // Estrondo sônico + varredura de frequência futurista
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(60, t);
+                    osc.frequency.exponentialRampToValueAtTime(2800, t + 0.7);
+                    gain.gain.setValueAtTime(0.65, t);
+                    gain.gain.exponentialRampToValueAtTime(0.001, t + 1.8);
+                    osc.start(t);
+                    osc.stop(t + 1.8);
                     break;
+
                 case 'crash':
-                    const bSize = audioCtx.sampleRate; const buffer = audioCtx.createBuffer(1, bSize, audioCtx.sampleRate);
-                    const data = buffer.getChannelData(0); for (let i = 0; i < bSize; i++) data[i] = (Math.random() * 2 - 1) * Math.exp(-i/(audioCtx.sampleRate*0.1));
-                    const noise = audioCtx.createBufferSource(); noise.buffer = buffer;
-                    const f = audioCtx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.setValueAtTime(1000, t); f.frequency.exponentialRampToValueAtTime(10, t + 1.0);
-                    noise.connect(f); f.connect(masterCompressor); noise.start(t);
+                    const bSize = Math.floor(audioCtx.sampleRate * 0.9);
+                    const buffer = audioCtx.createBuffer(1, bSize, audioCtx.sampleRate);
+                    const data = buffer.getChannelData(0);
+                    for (let i = 0; i < bSize; i++) {
+                        data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (audioCtx.sampleRate * 0.18));
+                    }
+                    const noise = audioCtx.createBufferSource();
+                    noise.buffer = buffer;
+                    const filter = audioCtx.createBiquadFilter();
+                    filter.type = 'lowpass';
+                    filter.frequency.setValueAtTime(1200, t);
+                    filter.frequency.exponentialRampToValueAtTime(40, t + 0.9);
+                    noise.connect(filter);
+                    filter.connect(masterCompressor);
+                    noise.start(t);
                     break;
             }
         }
 
         function startMusic() {
-            if(beatInterval) clearInterval(beatInterval); if(arpInterval) clearInterval(arpInterval);
-            let step = 0, arpStep = 0;
-            
-            beatInterval = setInterval(() => {
-                if(!gameActive || !audioCtx) return;
-                const t = audioCtx.currentTime;
-                
-                const hh = audioCtx.createBufferSource(); const hhBuf = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.05, audioCtx.sampleRate);
-                for(let i=0; i<hhBuf.length; i++) hhBuf.getChannelData(0)[i] = Math.random() * 2 - 1;
-                hh.buffer = hhBuf;
-                const hhFilt = audioCtx.createBiquadFilter(); hhFilt.type = 'highpass'; hhFilt.frequency.value = 7000;
-                const hhGain = audioCtx.createGain(); hhGain.gain.setValueAtTime(0.08, t); hhGain.gain.exponentialRampToValueAtTime(0.01, t + 0.05);
-                hh.connect(hhFilt); hhFilt.connect(hhGain); hhGain.connect(masterCompressor); hh.start(t);
+            stopMusic();
+            let step = 0;
 
+            musicTimer = setInterval(() => {
+                if (gameState !== 'PLAYING' || !audioCtx || audioCtx.state !== 'running') return;
+                const t = audioCtx.currentTime;
+
+                // 1. Kick (Batida 4/4 potente)
                 if (step % 4 === 0) {
-                    const isKick = (step % 8 === 0);
-                    const kOsc = audioCtx.createOscillator(); const kGain = audioCtx.createGain();
-                    kOsc.connect(kGain); kGain.connect(masterCompressor);
-                    kOsc.type = isKick ? 'sine' : 'triangle';
-                    kOsc.frequency.setValueAtTime(isKick ? 100 : 200, t); kOsc.frequency.exponentialRampToValueAtTime(0.01, t + 0.2);
-                    kGain.gain.setValueAtTime(isKick ? 0.7 : 0.4, t); kGain.gain.exponentialRampToValueAtTime(0.01, t + 0.2);
-                    kOsc.start(t); kOsc.stop(t + 0.2);
+                    const kOsc = audioCtx.createOscillator();
+                    const kGain = audioCtx.createGain();
+                    kOsc.type = 'sine';
+                    kOsc.frequency.setValueAtTime(125, t);
+                    kOsc.frequency.exponentialRampToValueAtTime(32, t + 0.18);
+                    kGain.gain.setValueAtTime(0.65, t);
+                    kGain.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
+                    kOsc.connect(kGain);
+                    kGain.connect(masterCompressor);
+                    kOsc.start(t);
+                    kOsc.stop(t + 0.22);
                 }
-                
-                if (step % 2 !== 0) {
-                    const bOsc = audioCtx.createOscillator(); const bGain = audioCtx.createGain(); const bFilt = audioCtx.createBiquadFilter();
-                    bOsc.type = 'sawtooth';
-                    bOsc.frequency.value = scale[Math.floor(step/4) % scale.length] / (isOverdrive ? 2 : 4);
-                    bFilt.type = 'lowpass'; bFilt.frequency.setValueAtTime(isOverdrive ? 2500 : 1000, t); bFilt.frequency.exponentialRampToValueAtTime(50, t + 0.2);
-                    bOsc.connect(bFilt); bFilt.connect(bGain); bGain.connect(masterCompressor);
-                    bGain.gain.setValueAtTime(0.4, t); bGain.gain.linearRampToValueAtTime(0, t + 0.2);
-                    bOsc.start(t); bOsc.stop(t + 0.2);
-                }
-                step = (step + 1) % 16;
-            }, 160);
 
-            arpInterval = setInterval(() => {
-                if(!gameActive || !audioCtx || comboMultiplier < 2) return;
-                const t = audioCtx.currentTime;
-                const aOsc = audioCtx.createOscillator(); const aGain = audioCtx.createGain();
-                aOsc.type = 'square';
-                const noteIndex = (arpStep * 2 + Math.floor(arpStep/3)) % scale.length;
-                aOsc.frequency.value = scale[noteIndex] * (isOverdrive ? 4 : 2); 
-                aOsc.connect(aGain); aGain.connect(masterCompressor);
-                aGain.gain.setValueAtTime(0.1, t); aGain.gain.exponentialRampToValueAtTime(0.01, t + 0.1);
-                aOsc.start(t); aOsc.stop(t + 0.1);
-                arpStep++;
-            }, 80);
+                // 2. Snare Retro (nos tempos 2 e 4)
+                if (step % 8 === 4) {
+                    const sLen = Math.floor(audioCtx.sampleRate * 0.16);
+                    const sBuf = audioCtx.createBuffer(1, sLen, audioCtx.sampleRate);
+                    const sData = sBuf.getChannelData(0);
+                    for (let i = 0; i < sLen; i++) sData[i] = (Math.random() * 2 - 1) * Math.exp(-i / (audioCtx.sampleRate * 0.06));
+                    const snare = audioCtx.createBufferSource();
+                    snare.buffer = sBuf;
+                    const sFilt = audioCtx.createBiquadFilter();
+                    sFilt.type = 'bandpass';
+                    sFilt.frequency.value = 1400;
+                    const sGain = audioCtx.createGain();
+                    sGain.gain.setValueAtTime(0.32, t);
+                    snare.connect(sFilt);
+                    sFilt.connect(sGain);
+                    sGain.connect(masterCompressor);
+                    snare.start(t);
+                }
+
+                // 3. Hi-Hat em semicolcheias
+                if (step % 2 === 1) {
+                    const hLen = Math.floor(audioCtx.sampleRate * 0.04);
+                    const hBuf = audioCtx.createBuffer(1, hLen, audioCtx.sampleRate);
+                    const hData = hBuf.getChannelData(0);
+                    for (let i = 0; i < hLen; i++) hData[i] = Math.random() * 2 - 1;
+                    const hh = audioCtx.createBufferSource();
+                    hh.buffer = hBuf;
+                    const hFilt = audioCtx.createBiquadFilter();
+                    hFilt.type = 'highpass';
+                    hFilt.frequency.value = 8000;
+                    const hGain = audioCtx.createGain();
+                    hGain.gain.setValueAtTime(0.07, t);
+                    hGain.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
+                    hh.connect(hFilt);
+                    hFilt.connect(hGain);
+                    hGain.connect(masterCompressor);
+                    hh.start(t);
+                }
+
+                // 4. Rolling Synth Bass (Baixo oitavado clássico Outrun)
+                const bOsc = audioCtx.createOscillator();
+                const bFilt = audioCtx.createBiquadFilter();
+                const bGain = audioCtx.createGain();
+                bOsc.type = 'sawtooth';
+                const barIndex = Math.floor(step / 8) % BASS_NOTES.length;
+                const octave = (step % 2 === 0) ? 0.5 : 1.0;
+                bOsc.frequency.value = BASS_NOTES[barIndex] * octave * (isOverdrive ? 1.25 : 1.0);
+
+                bFilt.type = 'lowpass';
+                bFilt.frequency.setValueAtTime(isOverdrive ? 2200 : 950, t);
+                bFilt.frequency.exponentialRampToValueAtTime(120, t + 0.14);
+
+                bGain.gain.setValueAtTime(0.28, t);
+                bGain.gain.exponentialRampToValueAtTime(0.001, t + 0.14);
+
+                bOsc.connect(bFilt);
+                bFilt.connect(bGain);
+                bGain.connect(masterCompressor);
+                bOsc.start(t);
+                bOsc.stop(t + 0.14);
+
+                // 5. Arpejo Melódico (ativa quando o Combo >= 2 ou em Overdrive)
+                if (comboMultiplier >= 2 || isOverdrive) {
+                    const aOsc = audioCtx.createOscillator();
+                    const aGain = audioCtx.createGain();
+                    aOsc.type = isOverdrive ? 'sawtooth' : 'triangle';
+                    const noteIdx = (step * 3 + Math.floor(step / 4)) % ARP_SCALE.length;
+                    aOsc.frequency.value = ARP_SCALE[noteIdx] * (isOverdrive ? 2 : 1);
+                    aGain.gain.setValueAtTime(0.09, t);
+                    aGain.gain.exponentialRampToValueAtTime(0.001, t + 0.11);
+                    aOsc.connect(aGain);
+                    aGain.connect(masterCompressor);
+                    aOsc.start(t);
+                    aOsc.stop(t + 0.11);
+                }
+
+                step = (step + 1) % 64;
+            }, 125); // ~120 BPM em semicolcheias
         }
 
+        function stopMusic() {
+            if (musicTimer) {
+                clearInterval(musicTimer);
+                musicTimer = null;
+            }
+        }
+
+        // ============================================================================
+        // 4. CONSTRUÇÃO DO CENÁRIO 3D & EFEITOS VISUAIS (Three.js)
+        // ============================================================================
         function generateSunTexture(theme) {
-            const c = document.createElement('canvas'); c.width = 1024; c.height = 1024; const ctx = c.getContext('2d');
+            const canvas = document.createElement('canvas');
+            canvas.width = 1024;
+            canvas.height = 1024;
+            const ctx = canvas.getContext('2d');
+
             const grd = ctx.createLinearGradient(0, 0, 0, 1024);
-            grd.addColorStop(0, theme.sun[0]); grd.addColorStop(0.5, theme.sun[1]); grd.addColorStop(1, theme.sun[2]);
-            ctx.fillStyle = grd; ctx.beginPath(); ctx.arc(512, 512, 500, 0, Math.PI * 2); ctx.fill();
+            grd.addColorStop(0, theme.sun[0]);
+            grd.addColorStop(0.5, theme.sun[1]);
+            grd.addColorStop(1, theme.sun[2]);
+
+            ctx.fillStyle = grd;
+            ctx.beginPath();
+            ctx.arc(512, 512, 490, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Recortes horizontais clássicos Synthwave
             ctx.globalCompositeOperation = 'destination-out';
-            for(let i = 0; i < 25; i++) { ctx.fillRect(0, 512 + Math.pow(i, 1.6) * 4.5, 1024, 3 + i*1.5); }
-            return new THREE.CanvasTexture(c);
+            for (let i = 0; i < 22; i++) {
+                const y = 510 + Math.pow(i, 1.55) * 4.8;
+                const h = 3 + i * 1.4;
+                ctx.fillRect(0, y, 1024, h);
+            }
+
+            const tex = new THREE.CanvasTexture(canvas);
+            tex.needsUpdate = true;
+            return tex;
         }
 
         function buildCityscape() {
-            if(cityscape) scene.remove(cityscape);
-            const geom = new THREE.BoxGeometry(1, 1, 1); geom.translate(0, 0.5, 0);
-            const mat = new THREE.MeshStandardMaterial({ color: themes[currentLevel].bld, roughness: 0.8, metalness: 0.2 });
-            cityscape = new THREE.InstancedMesh(geom, mat, 600);
-            
+            if (cityscape) scene.remove(cityscape);
+            const geom = new THREE.BoxGeometry(1, 1, 1);
+            geom.translate(0, 0.5, 0);
+
+            const mat = new THREE.MeshStandardMaterial({
+                color: ERAS[currentEraIndex].bld,
+                emissive: ERAS[currentEraIndex].grid,
+                emissiveIntensity: 0.08,
+                roughness: 0.7,
+                metalness: 0.4
+            });
+
+            cityscape = new THREE.InstancedMesh(geom, mat, 500);
             const dummy = new THREE.Object3D();
-            for(let i=0; i<600; i++) {
-                const x = (Math.random() - 0.5) * 1800; const z = -400 - Math.random() * 800;
-                if (Math.abs(x) < 180) continue; 
-                const width = 15 + Math.random() * 50; const height = 20 + Math.random() * 180 + (Math.abs(x)*0.2); const depth = 15 + Math.random() * 50;
-                dummy.position.set(x, 0, z); dummy.scale.set(width, height, depth); dummy.updateMatrix();
+
+            for (let i = 0; i < 500; i++) {
+                const side = Math.random() > 0.5 ? 1 : -1;
+                const x = side * (160 + Math.random() * 750);
+                const z = -250 - Math.random() * 950;
+                const width = 18 + Math.random() * 45;
+                const height = 25 + Math.random() * 190;
+                const depth = 18 + Math.random() * 45;
+
+                dummy.position.set(x, 0, z);
+                dummy.scale.set(width, height, depth);
+                dummy.updateMatrix();
                 cityscape.setMatrixAt(i, dummy.matrix);
             }
             scene.add(cityscape);
-        }
-
-        function initGraphics() {
-            const container = document.getElementById('game-container');
-
-            scene = new THREE.Scene();
-            scene.fog = new THREE.FogExp2(themes[0].fog, 0.0025);
-            
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
-            camera.position.set(0, 5.5, 15);
-            
-            renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: "high-performance" });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            renderer.toneMapping = THREE.ACESFilmicToneMapping;
-            container.appendChild(renderer.domElement);
-
-            bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 2.2, 0.6, 0.1);
-            composer = new EffectComposer(renderer);
-            composer.addPass(new RenderPass(scene, camera));
-            composer.addPass(bloomPass);
-
-            const ambient = new THREE.AmbientLight(0xffffff, 0.4);
-            mainLight = new THREE.DirectionalLight(0xffffff, 2.5); mainLight.position.set(20, 40, -20);
-            lightningLight = new THREE.PointLight(0x00ffff, 0, 800); lightningLight.position.set(0, 60, -100);
-            scene.add(ambient, mainLight, lightningLight);
-
-            sunMesh = new THREE.Mesh(new THREE.PlaneGeometry(800, 800), new THREE.MeshBasicMaterial({ map: generateSunTexture(themes[0]), transparent: true, fog: false }));
-            sunMesh.position.set(0, 180, -950); scene.add(sunMesh);
-
-            scene.add(new THREE.Mesh(new THREE.PlaneGeometry(1000, 2500).rotateX(-Math.PI/2), new THREE.MeshBasicMaterial({ color: 0x010003 })));
-            gridHelper = new THREE.GridHelper(2500, 200, themes[0].grid, themes[0].acc);
-            gridHelper.position.y = 0.1; gridHelper.material.transparent = true; gridHelper.material.opacity = 0.6; scene.add(gridHelper);
-
-            // Montanhas laterais otimizadas
-            const mountGeo = new THREE.PlaneGeometry(1800, 600, 80, 20); const pos = mountGeo.attributes.position;
-            for(let i=0; i<pos.count; i++) { if(Math.abs(pos.getX(i)) > 80) pos.setZ(i, Math.random()*120 + (Math.abs(pos.getX(i))-80)*0.7); }
-            mountGeo.computeVertexNormals();
-            terrain = new THREE.Mesh(mountGeo, new THREE.MeshStandardMaterial({ color: 0x000, emissive: themes[0].grid, emissiveIntensity: 0.3, wireframe: true }));
-            terrain.rotation.x = -Math.PI/2; terrain.position.y = 0.2; scene.add(terrain);
-
-            buildCityscape();
-
-            // Túnel Wormhole
-            const tunnelGeo = new THREE.CylinderGeometry(55, 18, 2000, 32, 20, true);
-            const tunnelMat = new THREE.MeshBasicMaterial({color: themes[0].acc, wireframe: true, transparent: true, opacity: 0, side: THREE.BackSide, blending: THREE.AdditiveBlending});
-            timeTunnel = new THREE.Mesh(tunnelGeo, tunnelMat);
-            timeTunnel.rotation.x = Math.PI / 2; timeTunnel.position.set(0, 5, -800);
-            scene.add(timeTunnel);
-
-            const starGeo = new THREE.BufferGeometry(); const starArr = new Float32Array(3000*3);
-            for(let i=0; i<9000; i+=3) { starArr[i]=(Math.random()-0.5)*1500; starArr[i+1]=Math.random()*600; starArr[i+2]=(Math.random()-0.5)*2000; }
-            starGeo.setAttribute('position', new THREE.BufferAttribute(starArr, 3));
-            starfield = new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xffffff, size: 0.8, transparent:true, opacity:0.8 }));
-            scene.add(starfield);
-
-            buildDeLorean();
-            setupControls();
-
-            window.addEventListener('resize', () => {
-                camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight); composer.setSize(window.innerWidth, window.innerHeight);
-            });
-
-            renderer.setAnimationLoop(mainLoop);
         }
 
         function buildDeLorean() {
             car = new THREE.Group();
             car.userData.wheelGroups = [];
 
-            const silverMat = new THREE.MeshStandardMaterial({ color: 0xcccccc, roughness: 0.2, metalness: 0.9 }); 
-            const darkMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.8, metalness: 0.3 }); 
-            const glassMat = new THREE.MeshStandardMaterial({ color: 0x050505, roughness: 0.0, metalness: 1.0 }); 
-            const timeGlowMat = new THREE.MeshStandardMaterial({ color: 0x000000, emissive: 0x00ffff, emissiveIntensity: 8 }); 
-            const tailMat = new THREE.MeshStandardMaterial({ color: 0x000000, emissive: 0xff1100, emissiveIntensity: 10 }); 
+            // Materiais de Aço Inox Escovado e Néon
+            const stainlessMat = new THREE.MeshStandardMaterial({ color: 0xd0d5dd, roughness: 0.22, metalness: 0.92 });
+            const trimMat = new THREE.MeshStandardMaterial({ color: 0x121218, roughness: 0.75, metalness: 0.3 });
+            const glassMat = new THREE.MeshStandardMaterial({ color: 0x050811, roughness: 0.05, metalness: 0.95 });
+            const fluxGlowMat = new THREE.MeshStandardMaterial({ color: 0x000000, emissive: 0x00ffff, emissiveIntensity: 7 });
+            const tailLightMat = new THREE.MeshStandardMaterial({ color: 0x000000, emissive: 0xff1100, emissiveIntensity: 9 });
+            const headLightMat = new THREE.MeshStandardMaterial({ color: 0x000000, emissive: 0xffffff, emissiveIntensity: 8 });
 
-            const body = new THREE.Mesh(new THREE.BoxGeometry(2.5, 0.4, 3.4), silverMat); body.position.set(0, 0.6, 0.4);
-            
-            const hoodGeo = new THREE.BoxGeometry(2.5, 0.35, 1.8); const hPos = hoodGeo.attributes.position;
-            for(let i=0; i<hPos.count; i++) { if(hPos.getZ(i) < 0 && hPos.getY(i) > 0) hPos.setY(i, -0.2); }
-            hoodGeo.computeVertexNormals(); const hood = new THREE.Mesh(hoodGeo, silverMat); hood.position.set(0, 0.6, -2.2);
-            
-            const fBumper = new THREE.Mesh(new THREE.BoxGeometry(2.5, 0.3, 0.4), darkMat); fBumper.position.set(0, 0.45, -3.3);
-            const rBumper = new THREE.Mesh(new THREE.BoxGeometry(2.5, 0.4, 0.5), darkMat); rBumper.position.set(0, 0.6, 2.3);
+            // Chassi Principal
+            const body = new THREE.Mesh(new THREE.BoxGeometry(2.5, 0.42, 3.5), stainlessMat);
+            body.position.set(0, 0.62, 0.35);
 
-            const cabinGeo = new THREE.BoxGeometry(1.9, 0.55, 2.3); const cPos = cabinGeo.attributes.position;
-            for(let i=0; i<cPos.count; i++) { 
-                if(cPos.getY(i) > 0) { cPos.setX(i, cPos.getX(i)*0.85); } 
-                if(cPos.getZ(i) < 0 && cPos.getY(i) > 0) cPos.setZ(i, cPos.getZ(i) + 0.5); 
+            // Capô inclinado aerodinâmico
+            const hoodGeo = new THREE.BoxGeometry(2.48, 0.36, 1.85);
+            const hPos = hoodGeo.attributes.position;
+            for (let i = 0; i < hPos.count; i++) {
+                if (hPos.getZ(i) < 0 && hPos.getY(i) > 0) hPos.setY(i, -0.18);
             }
-            cabinGeo.computeVertexNormals(); const cabin = new THREE.Mesh(cabinGeo, glassMat); cabin.position.set(0, 1.05, -0.2);
-            
-            const roof = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.05, 1.1), silverMat); roof.position.set(0, 1.32, -0.2);
-            const louvers = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.1, 1.6), darkMat); louvers.position.set(0, 1.05, 1.3); louvers.rotation.x = -0.2;
+            hoodGeo.computeVertexNormals();
+            const hood = new THREE.Mesh(hoodGeo, stainlessMat);
+            hood.position.set(0, 0.62, -2.25);
 
-            const tail = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.2, 0.2), tailMat); tail.position.set(0, 0.65, 2.55);
-            const fluxFront = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.1, 0.1), timeGlowMat); fluxFront.position.set(0, 0.65, -2.9);
-            const fluxL = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.1, 5.2), timeGlowMat); fluxL.position.set(-1.3, 0.65, -0.4);
-            const fluxR = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.1, 5.2), timeGlowMat); fluxR.position.set(1.3, 0.65, -0.4);
+            // Para-choques dianteiro e traseiro
+            const fBumper = new THREE.Mesh(new THREE.BoxGeometry(2.52, 0.32, 0.42), trimMat);
+            fBumper.position.set(0, 0.48, -3.32);
+            const rBumper = new THREE.Mesh(new THREE.BoxGeometry(2.52, 0.42, 0.48), trimMat);
+            rBumper.position.set(0, 0.62, 2.32);
 
-            const reactorBase = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.5, 0.9), silverMat); reactorBase.position.set(0, 0.9, 2.1);
-            const thrusterGeo = new THREE.CylinderGeometry(0.35, 0.45, 0.6, 16).rotateX(Math.PI/2);
-            const tL = new THREE.Mesh(thrusterGeo, darkMat); tL.position.set(-0.8, 1.1, 2.3);
-            const tR = new THREE.Mesh(thrusterGeo, darkMat); tR.position.set(0.8, 1.1, 2.3);
-            const tGlowGeo = new THREE.CylinderGeometry(0.25, 0.25, 0.62, 16).rotateX(Math.PI/2);
-            tL.add(new THREE.Mesh(tGlowGeo, timeGlowMat)); tR.add(new THREE.Mesh(tGlowGeo, timeGlowMat));
+            // Faróis dianteiros duplos
+            const hlL = new THREE.Mesh(new THREE.BoxGeometry(0.65, 0.14, 0.08), headLightMat);
+            hlL.position.set(-0.78, 0.56, -3.52);
+            const hlR = new THREE.Mesh(new THREE.BoxGeometry(0.65, 0.14, 0.08), headLightMat);
+            hlR.position.set(0.78, 0.56, -3.52);
 
-            car.add(body, hood, fBumper, rBumper, cabin, roof, louvers, tail, fluxFront, fluxL, fluxR, reactorBase, tL, tR);
+            // Cabine e Vidros
+            const cabinGeo = new THREE.BoxGeometry(1.92, 0.56, 2.35);
+            const cPos = cabinGeo.attributes.position;
+            for (let i = 0; i < cPos.count; i++) {
+                if (cPos.getY(i) > 0) cPos.setX(i, cPos.getX(i) * 0.84);
+                if (cPos.getZ(i) < 0 && cPos.getY(i) > 0) cPos.setZ(i, cPos.getZ(i) + 0.52);
+            }
+            cabinGeo.computeVertexNormals();
+            const cabin = new THREE.Mesh(cabinGeo, glassMat);
+            cabin.position.set(0, 1.06, -0.2);
 
-            // Rodas (Hover Mode)
-            const wheelGeo = new THREE.CylinderGeometry(0.45, 0.45, 0.55, 24).rotateZ(Math.PI/2);
-            const hubcapGeo = new THREE.CylinderGeometry(0.28, 0.28, 0.6, 16).rotateZ(Math.PI/2);
-            const hoverGlowGeo = new THREE.CylinderGeometry(0.4, 0.4, 0.65, 16).rotateZ(Math.PI/2);
-            
-            const wPos = [[-1.3, 0.45, 1.7], [1.3, 0.45, 1.7], [-1.3, 0.45, -1.9], [1.3, 0.45, -1.9]];
-            const foldDir = [1, -1, 1, -1]; 
+            const roof = new THREE.Mesh(new THREE.BoxGeometry(1.52, 0.06, 1.15), stainlessMat);
+            roof.position.set(0, 1.34, -0.2);
 
-            wPos.forEach((p, index) => { 
+            // Venezianas traseiras (Louvers)
+            const louvers = new THREE.Mesh(new THREE.BoxGeometry(1.55, 0.12, 1.65), trimMat);
+            louvers.position.set(0, 1.05, 1.32);
+            louvers.rotation.x = -0.22;
+
+            // Lanternas Traseiras em Grade
+            const tail = new THREE.Mesh(new THREE.BoxGeometry(2.42, 0.22, 0.15), tailLightMat);
+            tail.position.set(0, 0.66, 2.55);
+
+            // Bandas de Fluxo Temporal ao redor da carroçaria
+            const fluxFront = new THREE.Mesh(new THREE.BoxGeometry(2.62, 0.09, 0.09), fluxGlowMat);
+            fluxFront.position.set(0, 0.66, -2.95);
+            const fluxL = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.09, 5.3), fluxGlowMat);
+            fluxL.position.set(-1.31, 0.66, -0.35);
+            const fluxR = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.09, 5.3), fluxGlowMat);
+            fluxR.position.set(1.31, 0.66, -0.35);
+
+            // Reator Nuclear Mr. Fusion & Propulsores Traseiros
+            const reactorBase = new THREE.Mesh(new THREE.BoxGeometry(0.95, 0.45, 0.85), stainlessMat);
+            reactorBase.position.set(0, 0.92, 2.05);
+            const mrFusion = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.28, 0.45, 16), new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0x00ffff, emissiveIntensity: 1.5 }));
+            mrFusion.position.set(0, 1.28, 2.05);
+
+            const thrusterGeo = new THREE.CylinderGeometry(0.32, 0.44, 0.65, 16).rotateX(Math.PI / 2);
+            const tL = new THREE.Mesh(thrusterGeo, trimMat);
+            tL.position.set(-0.78, 1.12, 2.32);
+            const tR = new THREE.Mesh(thrusterGeo, trimMat);
+            tR.position.set(0.78, 1.12, 2.32);
+
+            const tGlowGeo = new THREE.CylinderGeometry(0.24, 0.24, 0.68, 16).rotateX(Math.PI / 2);
+            tL.add(new THREE.Mesh(tGlowGeo, fluxGlowMat));
+            tR.add(new THREE.Mesh(tGlowGeo, fluxGlowMat));
+
+            // Luz Néon sob o carro (Underglow)
+            carUnderGlow = new THREE.PointLight(0x00ffff, 3, 12);
+            carUnderGlow.position.set(0, 0.3, 0);
+
+            car.add(
+                body, hood, fBumper, rBumper, hlL, hlR, cabin, roof, louvers,
+                tail, fluxFront, fluxL, fluxR, reactorBase, mrFusion, tL, tR, carUnderGlow
+            );
+
+            // Rodas articuláveis para o Modo Hover
+            const wheelGeo = new THREE.CylinderGeometry(0.46, 0.46, 0.56, 24).rotateZ(Math.PI / 2);
+            const hubcapGeo = new THREE.CylinderGeometry(0.28, 0.28, 0.6, 16).rotateZ(Math.PI / 2);
+            const hoverGlowGeo = new THREE.CylinderGeometry(0.42, 0.42, 0.66, 16).rotateZ(Math.PI / 2);
+
+            const wheelPositions = [
+                [-1.32, 0.46, 1.72],
+                [ 1.32, 0.46, 1.72],
+                [-1.32, 0.46, -1.92],
+                [ 1.32, 0.46, -1.92]
+            ];
+            const foldDirections = [1, -1, 1, -1];
+
+            wheelPositions.forEach((pos, idx) => {
                 const wg = new THREE.Group();
-                const tire = new THREE.Mesh(wheelGeo, darkMat);
-                const hub = new THREE.Mesh(hubcapGeo, silverMat);
-                const hoverGlow = new THREE.Mesh(hoverGlowGeo, new THREE.MeshBasicMaterial({color: 0x00ffff, transparent:true, opacity:0, blending: THREE.AdditiveBlending}));
-                
-                wg.add(tire, hub, hoverGlow); wg.position.set(...p); 
-                car.add(wg); 
-                car.userData.wheelGroups.push({ mesh: wg, glow: hoverGlow, dir: foldDir[index] });
+                const tire = new THREE.Mesh(wheelGeo, trimMat);
+                const hub = new THREE.Mesh(hubcapGeo, stainlessMat);
+                const hoverGlow = new THREE.Mesh(
+                    hoverGlowGeo,
+                    new THREE.MeshBasicMaterial({ color: 0x00ffff, transparent: true, opacity: 0, blending: THREE.AdditiveBlending })
+                );
+
+                wg.add(tire, hub, hoverGlow);
+                wg.position.set(...pos);
+                car.add(wg);
+                car.userData.wheelGroups.push({ mesh: wg, glow: hoverGlow, dir: foldDirections[idx] });
             });
 
-            // Sombra
-            const shadowTex = new THREE.CanvasTexture((() => {
-                const c = document.createElement('canvas'); c.width = 128; c.height = 128; const ctx = c.getContext('2d');
-                const grad = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
-                grad.addColorStop(0, 'rgba(0,0,0,0.9)'); grad.addColorStop(1, 'rgba(0,0,0,0)');
-                ctx.fillStyle = grad; ctx.fillRect(0,0,128,128); return c;
-            })());
-            const shadow = new THREE.Mesh(new THREE.PlaneGeometry(4.0, 7.0), new THREE.MeshBasicMaterial({map: shadowTex, transparent: true, opacity: 0.9, depthWrite: false}));
-            shadow.rotation.x = -Math.PI/2; shadow.position.y = 0.05;
-            car.userData.shadow = shadow; scene.add(shadow);
+            // Sombra projetada no asfalto
+            const shadowCanvas = document.createElement('canvas');
+            shadowCanvas.width = 128;
+            shadowCanvas.height = 128;
+            const sCtx = shadowCanvas.getContext('2d');
+            const sGrad = sCtx.createRadialGradient(64, 64, 4, 64, 64, 62);
+            sGrad.addColorStop(0, 'rgba(0,0,0,0.92)');
+            sGrad.addColorStop(1, 'rgba(0,0,0,0)');
+            sCtx.fillStyle = sGrad;
+            sCtx.fillRect(0, 0, 128, 128);
 
-            car.userData.box = new THREE.Box3(); scene.add(car);
+            const shadow = new THREE.Mesh(
+                new THREE.PlaneGeometry(4.2, 7.2),
+                new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(shadowCanvas), transparent: true, opacity: 0.9, depthWrite: false })
+            );
+            shadow.rotation.x = -Math.PI / 2;
+            shadow.position.y = 0.04;
+            car.userData.shadow = shadow;
+            scene.add(shadow);
 
-            // Rasto de luz (Trails)
-            const MAX_TRAIL = 45;
-            lightTrails.geomL = new THREE.BufferGeometry(); lightTrails.geomR = new THREE.BufferGeometry();
-            lightTrails.mat = new THREE.LineBasicMaterial({ color: themes[0].acc, linewidth: 4, transparent: true, opacity: 0.8 });
-            const pArrL = new Float32Array(MAX_TRAIL * 3); const pArrR = new Float32Array(MAX_TRAIL * 3);
-            for(let i=0; i<MAX_TRAIL; i++) { lightTrails.left.push(new THREE.Vector3()); lightTrails.right.push(new THREE.Vector3()); }
+            car.userData.box = new THREE.Box3();
+            scene.add(car);
+
+            // Rastros de Luz Traseiros (Light Trails)
+            const MAX_TRAIL = 42;
+            lightTrails.geomL = new THREE.BufferGeometry();
+            lightTrails.geomR = new THREE.BufferGeometry();
+            lightTrails.mat = new THREE.LineBasicMaterial({ color: ERAS[0].acc, transparent: true, opacity: 0.85 });
+
+            const pArrL = new Float32Array(MAX_TRAIL * 3);
+            const pArrR = new Float32Array(MAX_TRAIL * 3);
+            for (let i = 0; i < MAX_TRAIL; i++) {
+                lightTrails.left.push(new THREE.Vector3());
+                lightTrails.right.push(new THREE.Vector3());
+            }
             lightTrails.geomL.setAttribute('position', new THREE.BufferAttribute(pArrL, 3));
             lightTrails.geomR.setAttribute('position', new THREE.BufferAttribute(pArrR, 3));
             scene.add(new THREE.Line(lightTrails.geomL, lightTrails.mat), new THREE.Line(lightTrails.geomR, lightTrails.mat));
         }
 
-        function getObstacle() {
+        function initGraphics() {
+            const container = document.getElementById('game-container');
+
+            scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(ERAS[0].fog, 0.0024);
+
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
+            camera.position.set(0, 5.4, 14.5);
+
+            renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: "high-performance" });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 1.15;
+            container.appendChild(renderer.domElement);
+
+            // Pós-processamento Bloom Néon
+            bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.9, 0.55, 0.15);
+            composer = new EffectComposer(renderer);
+            composer.addPass(new RenderPass(scene, camera));
+            composer.addPass(bloomPass);
+
+            // Iluminação Global
+            const ambient = new THREE.AmbientLight(0xffffff, 0.45);
+            const dirLight = new THREE.DirectionalLight(0xffffff, 2.2);
+            dirLight.position.set(15, 45, -20);
+            lightningLight = new THREE.PointLight(0x00ffff, 0, 900);
+            lightningLight.position.set(0, 70, -120);
+            scene.add(ambient, dirLight, lightningLight);
+
+            // Sol Retrowave no Horizonte
+            sunMesh = new THREE.Mesh(
+                new THREE.PlaneGeometry(820, 820),
+                new THREE.MeshBasicMaterial({ map: generateSunTexture(ERAS[0]), transparent: true, fog: false })
+            );
+            sunMesh.position.set(0, 185, -960);
+            scene.add(sunMesh);
+
+            // Pista Principal e Grade Néon
+            const roadBase = new THREE.Mesh(
+                new THREE.PlaneGeometry(1000, 2600).rotateX(-Math.PI / 2),
+                new THREE.MeshBasicMaterial({ color: 0x020006 })
+            );
+            scene.add(roadBase);
+
+            gridHelper = new THREE.GridHelper(2600, 220, ERAS[0].grid, ERAS[0].acc);
+            gridHelper.position.y = 0.08;
+            gridHelper.material.transparent = true;
+            gridHelper.material.opacity = 0.65;
+            scene.add(gridHelper);
+
+            // Montanhas Laterais Wireframe
+            const mountGeo = new THREE.PlaneGeometry(1800, 650, 72, 22);
+            const pos = mountGeo.attributes.position;
+            for (let i = 0; i < pos.count; i++) {
+                const vx = Math.abs(pos.getX(i));
+                if (vx > 75) {
+                    pos.setZ(i, Math.random() * 115 + (vx - 75) * 0.68);
+                }
+            }
+            mountGeo.computeVertexNormals();
+            terrain = new THREE.Mesh(
+                mountGeo,
+                new THREE.MeshStandardMaterial({ color: 0x000000, emissive: ERAS[0].grid, emissiveIntensity: 0.35, wireframe: true })
+            );
+            terrain.rotation.x = -Math.PI / 2;
+            terrain.position.y = 0.15;
+            scene.add(terrain);
+
+            buildCityscape();
+
+            // Túnel de Dobra Temporal (Wormhole)
+            const tunnelGeo = new THREE.CylinderGeometry(52, 16, 2000, 32, 20, true);
+            const tunnelMat = new THREE.MeshBasicMaterial({
+                color: ERAS[0].acc,
+                wireframe: true,
+                transparent: true,
+                opacity: 0,
+                side: THREE.BackSide,
+                blending: THREE.AdditiveBlending
+            });
+            timeTunnel = new THREE.Mesh(tunnelGeo, tunnelMat);
+            timeTunnel.rotation.x = Math.PI / 2;
+            timeTunnel.position.set(0, 5, -800);
+            scene.add(timeTunnel);
+
+            // Campo de Estrelas
+            const starGeo = new THREE.BufferGeometry();
+            const starArr = new Float32Array(2500 * 3);
+            for (let i = 0; i < starArr.length; i += 3) {
+                starArr[i] = (Math.random() - 0.5) * 1600;
+                starArr[i + 1] = 15 + Math.random() * 580;
+                starArr[i + 2] = (Math.random() - 0.5) * 2000;
+            }
+            starGeo.setAttribute('position', new THREE.BufferAttribute(starArr, 3));
+            starfield = new THREE.Points(
+                starGeo,
+                new THREE.PointsMaterial({ color: 0xffffff, size: 0.9, transparent: true, opacity: 0.85 })
+            );
+            scene.add(starfield);
+
+            buildDeLorean();
+            setupControls();
+
+            window.addEventListener('resize', onWindowResize);
+            renderer.setAnimationLoop(mainLoop);
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            composer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        // ============================================================================
+        // 5. SPAWNING & OBJECT POOLING
+        // ============================================================================
+        function spawnObstacle() {
+            const isMoving = Math.random() < (0.12 + currentEraIndex * 0.07);
+            const width = isMoving ? 4.2 : (Math.random() > 0.72 ? 11.5 : 4.2);
+            const color = isMoving ? ERAS[currentEraIndex].acc : (width > 5 ? 0xffaa00 : 0xff0055);
+
             let obs;
-            if (activePools.obstacles.length > 0) {
-                obs = activePools.obstacles.pop();
+            if (pools.obstacles.length > 0) {
+                obs = pools.obstacles.pop();
                 obs.visible = true;
             } else {
                 obs = new THREE.Group();
                 const solid = new THREE.Mesh(sharedAssets.obsGeo, sharedAssets.obsMatSolid);
-                const wire = new THREE.Mesh(sharedAssets.obsGeo, sharedAssets.obsMatWire.clone()); // Clonar para poder alterar cor localmente
+                const wire = new THREE.Mesh(sharedAssets.obsGeo, sharedAssets.obsMatWire.clone());
                 wire.name = 'wire';
                 obs.add(solid, wire);
                 scene.add(obs);
             }
-            return obs;
-        }
 
-        function spawnObstacle() {
-            const isMoving = Math.random() < (0.1 + (currentLevel * 0.08));
-            const width = isMoving ? 4 : (Math.random() > 0.7 ? 12 : 4);
-            const color = isMoving ? themes[currentLevel].acc : (width > 5 ? 0xffaa00 : 0xff0055);
-            
-            const obs = getObstacle();
-            obs.scale.set(width, 2.5, 2.5);
+            obs.scale.set(width, 2.4, 2.4);
             obs.children.find(c => c.name === 'wire').material.color.setHex(color);
-            
-            obs.position.set((Math.random() * (carMaxX * 2)) - carMaxX, 1.25, -600);
-            obs.userData = { box: new THREE.Box3(), type: 'obstacle', vx: isMoving ? (Math.random()>0.5?1:-1)*(0.2 + currentLevel*0.05) : 0, width: width };
+
+            const spawnX = (Math.random() * (CAR_MAX_X * 2 - width)) - (CAR_MAX_X - width / 2);
+            obs.position.set(spawnX, 1.2, -620);
+            obs.userData = {
+                box: new THREE.Box3(),
+                vx: isMoving ? (Math.random() > 0.5 ? 1 : -1) * (0.18 + currentEraIndex * 0.04) : 0,
+                width: width
+            };
             entities.obstacles.push(obs);
         }
 
-        function getCollectible(isBoost) {
-            let item;
-            const pool = activePools.collectibles.filter(i => i.userData.type === (isBoost ? 'boost' : 'ring'));
-            if (pool.length > 0) {
-                item = pool.pop();
-                activePools.collectibles = activePools.collectibles.filter(i => i !== item);
+        function spawnCollectible() {
+            const isBoost = Math.random() > 0.90;
+            const targetType = isBoost ? 'boost' : 'ring';
+
+            let item = null;
+            const idx = pools.collectibles.findIndex(i => i.userData.type === targetType);
+            if (idx !== -1) {
+                item = pools.collectibles.splice(idx, 1)[0];
                 item.visible = true;
             } else {
-                if(isBoost) {
-                    item = new THREE.Mesh(sharedAssets.boostGeo, sharedAssets.boostMat);
+                if (isBoost) {
+                    item = new THREE.Group();
+                    const outer = new THREE.Mesh(sharedAssets.boostGeo, sharedAssets.boostMat);
+                    const core = new THREE.Mesh(new THREE.OctahedronGeometry(1.0, 0), sharedAssets.boostCoreMat);
+                    item.add(outer, core);
                     item.userData = { type: 'boost' };
                 } else {
                     item = new THREE.Mesh(sharedAssets.ringGeo, sharedAssets.ringMat);
-                    item.rotation.y = Math.PI / 2; item.userData = { type: 'ring' };
+                    item.rotation.y = Math.PI / 2;
+                    item.userData = { type: 'ring' };
                 }
                 scene.add(item);
             }
-            return item;
-        }
 
-        function spawnCollectible() {
-            const isBoost = Math.random() > 0.92; 
-            const item = getCollectible(isBoost);
-            item.position.set((Math.random() * (carMaxX * 2)) - carMaxX, 2.0, -600);
-            item.userData.box = new THREE.Box3(); 
+            item.position.set((Math.random() * (CAR_MAX_X * 2)) - CAR_MAX_X, 2.0, -620);
+            item.userData.box = new THREE.Box3();
             entities.collectibles.push(item);
         }
 
         function createShockwave(pos, colorHex) {
-            const mat = new THREE.MeshBasicMaterial({ color: colorHex, transparent: true, opacity: 1, side: THREE.DoubleSide, depthWrite: false });
-            const wave = new THREE.Mesh(new THREE.SphereGeometry(1.5, 32, 32), mat);
-            wave.position.copy(pos); wave.userData = { life: 1, scale: 1 };
-            scene.add(wave); entities.shockwaves.push(wave);
+            const mat = new THREE.MeshBasicMaterial({
+                color: colorHex,
+                transparent: true,
+                opacity: 0.95,
+                side: THREE.DoubleSide,
+                depthWrite: false
+            });
+            const wave = new THREE.Mesh(new THREE.SphereGeometry(1.5, 24, 24), mat);
+            wave.position.copy(pos);
+            wave.userData = { life: 1.0, scale: 1.0 };
+            scene.add(wave);
+            entities.shockwaves.push(wave);
         }
 
         function triggerExplosion(pos, isBoost) {
             createShockwave(pos, isBoost ? 0x00ffff : 0xffaa00);
             const mat = isBoost ? sharedAssets.partMatBoost : sharedAssets.partMatCrash;
-            
-            for(let i=0; i<30; i++) {
+
+            for (let i = 0; i < 28; i++) {
                 let p;
-                if(activePools.particles.length > 0) {
-                    p = activePools.particles.pop(); p.visible = true;
+                if (pools.particles.length > 0) {
+                    p = pools.particles.pop();
+                    p.visible = true;
                 } else {
-                    p = new THREE.Mesh(sharedAssets.partGeo, mat); scene.add(p);
+                    p = new THREE.Mesh(sharedAssets.partGeo, mat);
+                    scene.add(p);
                 }
-                p.material = mat; p.position.copy(pos);
-                p.userData = { vel: new THREE.Vector3((Math.random()-0.5)*8, Math.random()*10, (Math.random()-0.5)*8) };
+                p.material = mat;
+                p.position.copy(pos);
+                p.userData = {
+                    vel: new THREE.Vector3((Math.random() - 0.5) * 9, Math.random() * 11, (Math.random() - 0.5) * 9)
+                };
                 entities.particles.push(p);
             }
         }
 
         function spawnFireTrail(x, z) {
-            let fL = new THREE.Mesh(sharedAssets.fireGeo, sharedAssets.fireMat); fL.rotation.x = -Math.PI/2; fL.position.set(x - 1.4, 0.15, z);
-            let fR = new THREE.Mesh(sharedAssets.fireGeo, sharedAssets.fireMat); fR.rotation.x = -Math.PI/2; fR.position.set(x + 1.4, 0.15, z);
-            fL.userData = { life: 1.0 }; fR.userData = { life: 1.0 };
-            scene.add(fL, fR); entities.fireTrails.push(fL, fR);
+            [-1.35, 1.35].forEach(offsetX => {
+                let f;
+                if (pools.fireTrails.length > 0) {
+                    f = pools.fireTrails.pop();
+                    f.visible = true;
+                    f.material.opacity = 0.95;
+                } else {
+                    f = new THREE.Mesh(sharedAssets.fireGeo, sharedAssets.fireMat.clone());
+                    f.rotation.x = -Math.PI / 2;
+                    scene.add(f);
+                }
+                f.position.set(x + offsetX, 0.12, z);
+                f.userData = { life: 1.0 };
+                entities.fireTrails.push(f);
+            });
         }
 
+        // ============================================================================
+        // 6. CONTROLES (Teclado, Touch Botões & Gestos Swipe)
+        // ============================================================================
         function setupControls() {
-            const setMove = (k, s) => { if(['ArrowLeft','a','A'].includes(k)) moveLeft = s; if(['ArrowRight','d','D'].includes(k)) moveRight = s; };
-            window.addEventListener('keydown', e => { 
-                setMove(e.key, true);
-                if((e.key === ' ' || e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') && !isJumping && gameActive) doJump();
-            });
-            window.addEventListener('keyup', e => setMove(e.key, false));
-            
-            const tch = (dir, s) => e => { e.preventDefault(); dir === 'l' ? moveLeft = s : moveRight = s; };
-            document.getElementById('touch-left').addEventListener('touchstart', tch('l', true)); document.getElementById('touch-left').addEventListener('touchend', tch('l', false));
-            document.getElementById('touch-right').addEventListener('touchstart', tch('r', true)); document.getElementById('touch-right').addEventListener('touchend', tch('r', false));
-            document.getElementById('touch-jump').addEventListener('touchstart', e => { e.preventDefault(); if(!isJumping && gameActive) doJump(); });
+            const setMove = (key, state) => {
+                if (['ArrowLeft', 'a', 'A'].includes(key)) moveLeft = state;
+                if (['ArrowRight', 'd', 'D'].includes(key)) moveRight = state;
+            };
 
+            window.addEventListener('keydown', e => {
+                if (e.key === 'p' || e.key === 'P' || e.key === 'Escape') {
+                    if (gameState === 'PLAYING') pauseGame();
+                    else if (gameState === 'PAUSED') resumeGame();
+                    return;
+                }
+                if (e.key === 'm' || e.key === 'M') {
+                    toggleMute();
+                    return;
+                }
+
+                setMove(e.key, true);
+                if ((e.key === ' ' || e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') && !isJumping && gameState === 'PLAYING') {
+                    doJump();
+                }
+            });
+
+            window.addEventListener('keyup', e => setMove(e.key, false));
+
+            // Botões táteis dedicados
+            const bindTouchBtn = (id, dir) => {
+                const el = document.getElementById(id);
+                el.addEventListener('touchstart', e => { e.preventDefault(); if (dir === 'l') moveLeft = true; else moveRight = true; }, { passive: false });
+                el.addEventListener('touchend', e => { e.preventDefault(); if (dir === 'l') moveLeft = false; else moveRight = false; }, { passive: false });
+            };
+            bindTouchBtn('touch-left', 'l');
+            bindTouchBtn('touch-right', 'r');
+
+            document.getElementById('touch-jump').addEventListener('touchstart', e => {
+                e.preventDefault();
+                if (!isJumping && gameState === 'PLAYING') doJump();
+            }, { passive: false });
+
+            // Suporte a Swipe em qualquer lugar do ecrã
+            let touchStartX = 0, touchStartY = 0;
+            window.addEventListener('touchstart', e => {
+                if (e.touches.length > 0) {
+                    touchStartX = e.touches[0].clientX;
+                    touchStartY = e.touches[0].clientY;
+                }
+            }, { passive: true });
+
+            window.addEventListener('touchend', e => {
+                if (gameState !== 'PLAYING' || e.changedTouches.length === 0) return;
+                const dx = e.changedTouches[0].clientX - touchStartX;
+                const dy = e.changedTouches[0].clientY - touchStartY;
+                if (dy < -45 && Math.abs(dy) > Math.abs(dx) && !isJumping) {
+                    doJump();
+                }
+            }, { passive: true });
+
+            // Botões de UI
             document.getElementById('start-btn').addEventListener('click', startGame);
             document.getElementById('restart-btn').addEventListener('click', startGame);
+            document.getElementById('pause-restart-btn').addEventListener('click', startGame);
+            document.getElementById('pause-btn').addEventListener('click', () => {
+                if (gameState === 'PLAYING') pauseGame();
+                else if (gameState === 'PAUSED') resumeGame();
+            });
+            document.getElementById('resume-btn').addEventListener('click', resumeGame);
+            ui.muteBtn.addEventListener('click', toggleMute);
         }
 
         function doJump() {
-            isJumping = true; carVelocityY = jumpStrength; playSfx('jump');
-            car.scale.set(0.85, 1.2, 0.85); setTimeout(() => car.scale.set(1, 1, 1), 150);
+            isJumping = true;
+            carVelocityY = JUMP_STRENGTH;
+            playSfx('jump');
+            car.scale.set(0.88, 1.18, 0.88);
+            setTimeout(() => { if (car) car.scale.set(1, 1, 1); }, 140);
         }
 
-        function timeTravelEffect() {
+        // ============================================================================
+        // 7. GESTÃO DE ESTADO DO JOGO & VIAGEM NO TEMPO
+        // ============================================================================
+        function triggerTimeTravel() {
             playSfx('time_travel');
-            
-            ui.flash.style.opacity = 1; ui.flash.style.transition = 'none';
-            setTimeout(() => { ui.flash.style.transition = 'opacity 1.5s ease-out'; ui.flash.style.opacity = 0; }, 50);
+            timeJumpsCount++;
 
-            screenShake = 4.0; 
-            
-            let newLvl; do { newLvl = Math.floor(Math.random() * themes.length); } while(newLvl === currentLevel);
-            currentLevel = newLvl; const th = themes[currentLevel];
-            
-            ui.level.innerText = th.name; ui.level.style.color = th.grid;
-            ui.notification.innerText = `${th.name} ERA`; ui.notification.style.textShadow = `0 0 20px ${th.grid}, 0 0 80px #fff`;
-            ui.notification.classList.remove('level-up-anim'); void ui.notification.offsetWidth; ui.notification.classList.add('level-up-anim');
+            // Flash branco na tela
+            ui.flash.style.transition = 'none';
+            ui.flash.style.opacity = 1;
+            requestAnimationFrame(() => {
+                setTimeout(() => {
+                    ui.flash.style.transition = 'opacity 1.4s ease-out';
+                    ui.flash.style.opacity = 0;
+                }, 40);
+            });
 
-            scene.fog.color.setHex(th.fog); gridHelper.material.color.setHex(th.grid); terrain.material.emissive.setHex(th.grid);
-            sunMesh.material.map = generateSunTexture(th); lightTrails.mat.color.setHex(th.acc); 
-            cityscape.material.color.setHex(th.bld); timeTunnel.material.color.setHex(th.acc);
-            sharedAssets.ringMat.emissive.setHex(th.acc);
+            screenShake = 3.8;
+
+            // Escolhe uma nova Era diferente da atual
+            let nextEra;
+            do {
+                nextEra = Math.floor(Math.random() * ERAS.length);
+            } while (nextEra === currentEraIndex);
+
+            currentEraIndex = nextEra;
+            const era = ERAS[currentEraIndex];
+
+            ui.level.innerText = era.name;
+            ui.level.style.color = `#${era.grid.toString(16).padStart(6, '0')}`;
+
+            ui.notification.innerText = era.label;
+            ui.notification.style.textShadow = `0 0 20px #${era.grid.toString(16).padStart(6, '0')}, 0 0 70px #fff`;
+            ui.notification.classList.remove('level-up-anim');
+            void ui.notification.offsetWidth;
+            ui.notification.classList.add('level-up-anim');
+
+            // Atualiza ambiente 3D
+            scene.fog.color.setHex(era.fog);
+            gridHelper.material.color.setHex(era.grid);
+            terrain.material.emissive.setHex(era.grid);
+            sunMesh.material.map = generateSunTexture(era);
+            lightTrails.mat.color.setHex(era.acc);
+            cityscape.material.color.setHex(era.bld);
+            cityscape.material.emissive.setHex(era.grid);
+            timeTunnel.material.color.setHex(era.acc);
+            sharedAssets.ringMat.emissive.setHex(era.acc);
+            carUnderGlow.color.setHex(era.acc);
         }
 
         function clearEntities() {
-            ['obstacles', 'collectibles', 'particles'].forEach(k => {
-                entities[k].forEach(obj => { obj.visible = false; activePools[k].push(obj); });
-                entities[k].length = 0;
+            ['obstacles', 'collectibles', 'particles', 'fireTrails'].forEach(key => {
+                entities[key].forEach(obj => {
+                    obj.visible = false;
+                    pools[key].push(obj);
+                });
+                entities[key].length = 0;
             });
-            ['shockwaves', 'fireTrails'].forEach(k => {
-                entities[k].forEach(obj => scene.remove(obj)); entities[k].length = 0;
-            });
+            entities.shockwaves.forEach(obj => scene.remove(obj));
+            entities.shockwaves.length = 0;
         }
 
         function startGame() {
-            initAudio(); if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+            initAudio();
+            if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+
             document.getElementById('start-screen').classList.add('hidden');
             document.getElementById('game-over-screen').classList.add('hidden');
-            
-            score = 0; currentLevel = 0; speed = baseSpeed;
-            carVelocityX = 0; carVelocityY = 0; isJumping = false; moveLeft = false; moveRight = false;
-            isOverdrive = false; invulnerableTimer = 0; overdriveTimer = 0; comboMultiplier = 1; comboTimer = 0;
-            
-            ui.combo.innerText = 'x1'; ui.combo.classList.remove('combo-active');
-            ui.overdrive.classList.remove('overdrive-on'); bloomPass.strength = 2.2;
-            ui.level.innerText = '1985'; ui.level.style.color = themes[0].grid;
-            ui.fluxCap.classList.remove('flux-active'); ui.fluxStatus.innerText = 'STANDBY'; ui.fluxStatus.style.color = '#555';
-            
-            scene.fog.color.setHex(themes[0].fog); gridHelper.material.color.setHex(themes[0].grid); terrain.material.emissive.setHex(themes[0].grid);
-            sunMesh.material.map = generateSunTexture(themes[0]); lightTrails.mat.color.setHex(themes[0].acc); 
-            cityscape.material.color.setHex(themes[0].bld); timeTunnel.material.color.setHex(themes[0].acc);
-            
-            car.position.set(0, 0, 0); car.rotation.set(0, 0, 0); car.visible = true; car.userData.shadow.visible = true;
+            document.getElementById('pause-screen').classList.add('hidden');
+            document.getElementById('new-record-badge').style.display = 'none';
+
+            score = 0;
+            maxComboReached = 1;
+            timeJumpsCount = 0;
+            currentEraIndex = 0;
+            speed = BASE_SPEED;
+
+            carVelocityX = 0;
+            carVelocityY = 0;
+            isJumping = false;
+            moveLeft = false;
+            moveRight = false;
+
+            isOverdrive = false;
+            invulnerableTimer = 0;
+            overdriveTimer = 0;
+            comboMultiplier = 1;
+            comboTimer = 0;
+            screenShake = 0;
+
+            ui.combo.innerText = 'x1';
+            ui.combo.classList.remove('combo-active');
+            ui.overdrive.classList.remove('overdrive-on');
+            ui.overdriveBar.style.width = '0%';
+            ui.level.innerText = '1985';
+            ui.level.style.color = 'var(--neon-blue)';
+            ui.fluxCap.classList.remove('flux-active');
+            ui.fluxStatus.innerText = 'STANDBY';
+            ui.fluxStatus.style.color = '#666';
+
+            bloomPass.strength = 1.9;
+            const initialEra = ERAS[0];
+            scene.fog.color.setHex(initialEra.fog);
+            gridHelper.material.color.setHex(initialEra.grid);
+            terrain.material.emissive.setHex(initialEra.grid);
+            sunMesh.material.map = generateSunTexture(initialEra);
+            lightTrails.mat.color.setHex(initialEra.acc);
+            cityscape.material.color.setHex(initialEra.bld);
+            cityscape.material.emissive.setHex(initialEra.grid);
+            timeTunnel.material.color.setHex(initialEra.acc);
+            carUnderGlow.color.setHex(initialEra.acc);
+
+            car.position.set(0, 0, 0);
+            car.rotation.set(0, 0, 0);
+            car.visible = true;
+            car.userData.shadow.visible = true;
 
             clearEntities();
-            lightTrails.left.forEach(v => v.set(0,0,0)); lightTrails.right.forEach(v => v.set(0,0,0));
+            lightTrails.left.forEach(v => v.set(0, 0, 0));
+            lightTrails.right.forEach(v => v.set(0, 0, 0));
 
-            startMusic(); gameActive = true;
+            clock.getDelta();
+            gameState = 'PLAYING';
+            startMusic();
+        }
+
+        function pauseGame() {
+            if (gameState !== 'PLAYING') return;
+            gameState = 'PAUSED';
+            document.getElementById('pause-screen').classList.remove('hidden');
+            if (engineGain && audioCtx) engineGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.05);
+        }
+
+        function resumeGame() {
+            if (gameState !== 'PAUSED') return;
+            document.getElementById('pause-screen').classList.add('hidden');
+            clock.getDelta(); // Evita salto de delta time após pausa
+            gameState = 'PLAYING';
+            if (engineGain && audioCtx) engineGain.gain.setTargetAtTime(0.14, audioCtx.currentTime, 0.05);
         }
 
         function handleCollision(obs, index) {
             if (isOverdrive) {
-                triggerExplosion(obs.position, false); score += 500 * comboMultiplier;
-                obs.visible = false; activePools.obstacles.push(obs); entities.obstacles.splice(index, 1); 
-                playSfx('crash'); screenShake = 1.0;
-            } 
-            else if (invulnerableTimer <= 0) {
-                screenShake = 2.0;
-                gameActive = false; triggerExplosion(car.position, false); car.visible = false; car.userData.shadow.visible = false; playSfx('crash');
-                if(beatInterval) clearInterval(beatInterval); if(arpInterval) clearInterval(arpInterval);
+                // Em 88 MPH o DeLorean destrói tudo no caminho!
+                triggerExplosion(obs.position, true);
+                score += 500 * comboMultiplier;
+                obs.visible = false;
+                pools.obstacles.push(obs);
+                entities.obstacles.splice(index, 1);
+                playSfx('crash');
+                screenShake = 1.1;
+            } else if (invulnerableTimer <= 0) {
+                screenShake = 2.4;
+                gameState = 'GAMEOVER';
+                triggerExplosion(car.position, false);
+                car.visible = false;
+                car.userData.shadow.visible = false;
+                playSfx('crash');
+                stopMusic();
+                if (engineGain && audioCtx) engineGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.05);
+
+                const finalPts = Math.floor(score);
+                if (finalPts > highScore) {
+                    highScore = finalPts;
+                    localStorage.setItem('sunset_delorean_highscore', highScore.toString());
+                    ui.highScore.innerText = highScore.toString().padStart(6, '0');
+                    document.getElementById('new-record-badge').style.display = 'block';
+                }
+
                 setTimeout(() => {
-                    document.getElementById('final-score').innerText = `PONTOS: ${Math.floor(score)}`;
+                    document.getElementById('final-score').innerText = finalPts.toLocaleString('pt-PT');
+                    document.getElementById('final-combo').innerText = `x${maxComboReached}`;
+                    document.getElementById('final-jumps').innerText = timeJumpsCount;
                     document.getElementById('game-over-screen').classList.remove('hidden');
-                }, 2500);
+                }, 1800);
             }
         }
 
+        // ============================================================================
+        // 8. LOOP PRINCIPAL DE SIMULAÇÃO (Delta-Time Normalizado)
+        // ============================================================================
         function mainLoop() {
-            const simSpeed = gameActive ? speed : 0.2;
-            
-            gridHelper.position.z += simSpeed * 2.5; if(gridHelper.position.z > 20) gridHelper.position.z -= 20;
-            terrain.position.z += simSpeed * 2.5; if(terrain.position.z > 20) terrain.position.z -= 20;
-            
+            // Normaliza o passo de tempo para 60 FPS (dt = 1.0 a 60Hz)
+            const rawDelta = Math.min(clock.getDelta(), 0.05);
+            const dt = rawDelta * 60;
+
+            if (gameState === 'PAUSED') {
+                composer.render();
+                return;
+            }
+
+            const simSpeed = (gameState === 'PLAYING') ? speed : 0.35;
+
+            // Movimento do Chão e Montanhas
+            gridHelper.position.z += simSpeed * 2.5 * dt;
+            if (gridHelper.position.z > 20) gridHelper.position.z -= 20;
+
+            terrain.position.z += simSpeed * 2.5 * dt;
+            if (terrain.position.z > 20) terrain.position.z -= 20;
+
+            // Movimento das Estrelas
             const pAttr = starfield.geometry.attributes.position;
-            const starSpeed = isOverdrive ? simSpeed * 20 : simSpeed * 2.5; 
-            for(let i=2; i<pAttr.array.length; i+=3) { pAttr.array[i] += starSpeed; if(pAttr.array[i] > 200) pAttr.array[i] = -1800; }
-            starfield.geometry.attributes.position.needsUpdate = true;
+            const starSpeed = (isOverdrive ? simSpeed * 18 : simSpeed * 2.5) * dt;
+            for (let i = 2; i < pAttr.array.length; i += 3) {
+                pAttr.array[i] += starSpeed;
+                if (pAttr.array[i] > 200) pAttr.array[i] = -1800;
+            }
+            pAttr.needsUpdate = true;
 
-            for(let i=entities.fireTrails.length-1; i>=0; i--) {
-                let f = entities.fireTrails[i]; f.position.z += simSpeed * 3.0; 
-                f.userData.life -= 0.015; f.material.opacity = f.userData.life;
-                if(f.userData.life <= 0 || f.position.z > 20) { scene.remove(f); entities.fireTrails.splice(i, 1); }
+            // Atualiza Rastros de Fogo no Asfalto
+            for (let i = entities.fireTrails.length - 1; i >= 0; i--) {
+                const f = entities.fireTrails[i];
+                f.position.z += simSpeed * 3.0 * dt;
+                f.userData.life -= 0.016 * dt;
+                f.material.opacity = Math.max(0, f.userData.life);
+                if (f.userData.life <= 0 || f.position.z > 25) {
+                    f.visible = false;
+                    pools.fireTrails.push(f);
+                    entities.fireTrails.splice(i, 1);
+                }
             }
 
-            if(gameActive && Math.random() < (isOverdrive ? 0.2 : 0.002)) {
-                lightningLight.intensity = Math.random() * 5 + 5; setTimeout(() => lightningLight.intensity = 0, 50);
+            // Relâmpagos atmosféricos
+            if (gameState === 'PLAYING' && Math.random() < (isOverdrive ? 0.18 : 0.002) * dt) {
+                lightningLight.intensity = Math.random() * 6 + 4;
+                setTimeout(() => { if (lightningLight) lightningLight.intensity = 0; }, 55);
             }
 
-            if (gameActive) {
-                if(invulnerableTimer > 0) { invulnerableTimer--; car.visible = (invulnerableTimer % 8 < 4); } else { car.visible = true; }
+            if (gameState === 'PLAYING') {
+                // Invulnerabilidade pós-overdrive
+                if (invulnerableTimer > 0) {
+                    invulnerableTimer -= dt;
+                    car.visible = isOverdrive ? true : (Math.floor(invulnerableTimer) % 8 < 4);
+                } else {
+                    car.visible = true;
+                }
 
+                // Lógica de Overdrive (88 MPH)
                 if (isOverdrive) {
-                    overdriveTimer--;
-                    speed = THREE.MathUtils.lerp(speed, speedOverdrive, 0.1);
-                    camera.fov = THREE.MathUtils.lerp(camera.fov, 140, 0.1); 
-                    starfield.material.size = 3.5; 
-                    
-                    timeTunnel.material.opacity = THREE.MathUtils.lerp(timeTunnel.material.opacity, 0.6, 0.05);
-                    timeTunnel.rotation.y += 0.05;
+                    overdriveTimer -= dt;
+                    speed = THREE.MathUtils.lerp(speed, SPEED_OVERDRIVE, 0.1 * dt);
+                    camera.fov = THREE.MathUtils.lerp(camera.fov, 132, 0.08 * dt);
+                    starfield.material.size = 3.2;
 
-                    if (overdriveTimer % 3 === 0) spawnFireTrail(car.position.x, car.position.z);
+                    timeTunnel.material.opacity = THREE.MathUtils.lerp(timeTunnel.material.opacity, 0.55, 0.06 * dt);
+                    timeTunnel.rotation.y += 0.05 * dt;
+
+                    ui.overdriveBar.style.width = `${Math.max(0, (overdriveTimer / OVERDRIVE_DURATION) * 100)}%`;
+
+                    if (Math.floor(overdriveTimer) % 3 === 0) {
+                        spawnFireTrail(car.position.x, car.position.z);
+                    }
 
                     if (overdriveTimer <= 0) {
-                        isOverdrive = false; ui.overdrive.classList.remove('overdrive-on');
-                        ui.fluxCap.classList.remove('flux-active'); ui.fluxStatus.innerText = 'STANDBY'; ui.fluxStatus.style.color = '#555';
-                        bloomPass.strength = 2.2; starfield.material.size = 0.8;
+                        isOverdrive = false;
+                        invulnerableTimer = 60; // 1 segundo de proteção extra ao sair do salto
+                        ui.overdrive.classList.remove('overdrive-on');
+                        ui.fluxCap.classList.remove('flux-active');
+                        ui.fluxStatus.innerText = 'STANDBY';
+                        ui.fluxStatus.style.color = '#666';
+                        ui.overdriveBar.style.width = '0%';
+                        bloomPass.strength = 1.9;
+                        starfield.material.size = 0.9;
                     }
                 } else {
-                    speed = Math.min(maxSpeedNormal + (score * 0.0001), baseSpeed + (score * 0.0002));
-                    camera.fov = THREE.MathUtils.lerp(camera.fov, 75 + (speed * 1.5), 0.05);
-                    timeTunnel.material.opacity = THREE.MathUtils.lerp(timeTunnel.material.opacity, 0, 0.1);
+                    const targetSpeed = Math.min(MAX_SPEED_NORMAL, BASE_SPEED + (score * 0.00016));
+                    speed = THREE.MathUtils.lerp(speed, targetSpeed, 0.05 * dt);
+                    camera.fov = THREE.MathUtils.lerp(camera.fov, 75 + (speed * 1.6), 0.05 * dt);
+                    timeTunnel.material.opacity = THREE.MathUtils.lerp(timeTunnel.material.opacity, 0, 0.1 * dt);
                 }
                 camera.updateProjectionMatrix();
 
-                if (comboTimer > 0) { comboTimer--; if(comboTimer === 0) { comboMultiplier = 1; ui.combo.innerText = `x1`; ui.combo.classList.remove('combo-active'); } }
-
-                score += simSpeed * 0.3 * comboMultiplier;
-                ui.score.innerText = Math.floor(score).toString().padStart(6, '0');
-                ui.speed.innerText = `${Math.floor((speed / speedOverdrive) * 88)} MPH`; 
-                if(isOverdrive) ui.speed.innerText = "88 MPH";
-                
-                if(engineOsc) engineOsc.frequency.setTargetAtTime(60 + (speed * 15) + (isJumping ? 80 : 0), audioCtx.currentTime, 0.1);
-
-                if (moveLeft) carVelocityX -= carAccel;
-                if (moveRight) carVelocityX += carAccel;
-                carVelocityX *= carFriction; car.position.x += carVelocityX;
-                if(car.position.x > carMaxX) { car.position.x = carMaxX; carVelocityX = 0; }
-                if(car.position.x < -carMaxX) { car.position.x = -carMaxX; carVelocityX = 0; }
-
-                if (isJumping) {
-                    car.position.y += carVelocityY; carVelocityY -= gravity;
-                    if (car.position.y <= 0) { car.position.y = 0; isJumping = false; playSfx('land'); screenShake=0.2; } 
-                } else {
-                    car.position.y = Math.sin(Date.now() * 0.015 * speed) * 0.08; 
+                // Temporizador do Combo
+                if (comboTimer > 0) {
+                    comboTimer -= dt;
+                    if (comboTimer <= 0) {
+                        comboMultiplier = 1;
+                        ui.combo.innerText = 'x1';
+                        ui.combo.classList.remove('combo-active');
+                    }
                 }
 
+                // Pontuação & Velocímetro HUD
+                score += simSpeed * 0.35 * comboMultiplier * dt;
+                ui.score.innerText = Math.floor(score).toString().padStart(6, '0');
+                const mph = isOverdrive ? 88 : Math.min(87, Math.floor((speed / MAX_SPEED_NORMAL) * 84));
+                ui.speed.innerText = `${mph.toString().padStart(2, '0')} MPH`;
+
+                if (engineOsc && audioCtx) {
+                    engineOsc.frequency.setTargetAtTime(60 + (speed * 14) + (isJumping ? 75 : 0), audioCtx.currentTime, 0.08);
+                }
+
+                // Movimento Lateral do DeLorean
+                if (moveLeft) carVelocityX -= CAR_ACCEL * dt;
+                if (moveRight) carVelocityX += CAR_ACCEL * dt;
+                carVelocityX *= Math.pow(CAR_FRICTION, dt);
+                car.position.x += carVelocityX * dt;
+
+                if (car.position.x > CAR_MAX_X) { car.position.x = CAR_MAX_X; carVelocityX = 0; }
+                if (car.position.x < -CAR_MAX_X) { car.position.x = -CAR_MAX_X; carVelocityX = 0; }
+
+                // Física Vertical (Salto / Modo Hover)
+                if (isJumping) {
+                    car.position.y += carVelocityY * dt;
+                    carVelocityY -= GRAVITY * dt;
+                    if (car.position.y <= 0) {
+                        car.position.y = 0;
+                        isJumping = false;
+                        playSfx('land');
+                        screenShake = 0.25;
+                    }
+                } else {
+                    car.position.y = Math.sin(Date.now() * 0.015 * speed) * 0.06;
+                }
+
+                // Articulação das Rodas (Hover Conversion)
                 const hoverTarget = isJumping ? (Math.PI / 2) : 0;
                 car.userData.wheelGroups.forEach(w => {
-                    w.mesh.rotation.z = THREE.MathUtils.lerp(w.mesh.rotation.z, hoverTarget * w.dir, 0.2);
-                    w.glow.material.opacity = THREE.MathUtils.lerp(w.glow.material.opacity, isJumping ? 0.9 : 0, 0.2);
+                    w.mesh.rotation.z = THREE.MathUtils.lerp(w.mesh.rotation.z, hoverTarget * w.dir, 0.22 * dt);
+                    w.glow.material.opacity = THREE.MathUtils.lerp(w.glow.material.opacity, isJumping ? 0.92 : 0, 0.22 * dt);
                 });
 
-                car.rotation.z = -carVelocityX * 0.25; car.rotation.y = -carVelocityX * 0.15;
+                // Inclinação dinâmica (Roll & Yaw)
+                car.rotation.z = -carVelocityX * 0.24;
+                car.rotation.y = -carVelocityX * 0.14;
                 car.userData.shadow.position.x = car.position.x;
-                car.userData.shadow.material.opacity = isJumping ? 0.3 : 0.9; 
+                car.userData.shadow.material.opacity = isJumping ? 0.28 : 0.9;
 
-                car.userData.box.setFromObject(car); car.userData.box.expandByScalar(-0.4); 
+                car.userData.box.setFromObject(car);
+                car.userData.box.expandByScalar(-0.42);
 
-                const tl = lightTrails.left, tr = lightTrails.right; tl.pop(); tr.pop();
-                const pL = new THREE.Vector3(-1.4, car.position.y + 0.35, car.position.z + 1.7).applyMatrix4(car.matrixWorld);
-                const pR = new THREE.Vector3(1.4, car.position.y + 0.35, car.position.z + 1.7).applyMatrix4(car.matrixWorld);
-                tl.unshift(pL); tr.unshift(pR);
-                const pArrL = lightTrails.geomL.attributes.position.array; const pArrR = lightTrails.geomR.attributes.position.array;
-                for(let i=0; i<tl.length; i++) {
-                    const tY = isJumping ? car.position.y + 0.35 : 0.2;
-                    pArrL[i*3]=tl[i].x; pArrL[i*3+1]=THREE.MathUtils.lerp(pArrL[i*3+1], tY, 0.5); pArrL[i*3+2]=tl[i].z + (i*2.2); 
-                    pArrR[i*3]=tr[i].x; pArrR[i*3+1]=THREE.MathUtils.lerp(pArrR[i*3+1], tY, 0.5); pArrR[i*3+2]=tr[i].z + (i*2.2);
+                // Atualização dos Light Trails
+                const tl = lightTrails.left, tr = lightTrails.right;
+                tl.pop();
+                tr.pop();
+                const pL = new THREE.Vector3(-1.35, car.position.y + 0.35, car.position.z + 1.8).applyMatrix4(car.matrixWorld);
+                const pR = new THREE.Vector3(1.35, car.position.y + 0.35, car.position.z + 1.8).applyMatrix4(car.matrixWorld);
+                tl.unshift(pL);
+                tr.unshift(pR);
+
+                const pArrL = lightTrails.geomL.attributes.position.array;
+                const pArrR = lightTrails.geomR.attributes.position.array;
+                for (let i = 0; i < tl.length; i++) {
+                    const tY = isJumping ? car.position.y + 0.35 : 0.22;
+                    pArrL[i * 3] = tl[i].x;
+                    pArrL[i * 3 + 1] = THREE.MathUtils.lerp(pArrL[i * 3 + 1], tY, 0.5);
+                    pArrL[i * 3 + 2] = tl[i].z + (i * 2.1);
+
+                    pArrR[i * 3] = tr[i].x;
+                    pArrR[i * 3 + 1] = THREE.MathUtils.lerp(pArrR[i * 3 + 1], tY, 0.5);
+                    pArrR[i * 3 + 2] = tr[i].z + (i * 2.1);
                 }
-                lightTrails.geomL.attributes.position.needsUpdate = true; lightTrails.geomR.attributes.position.needsUpdate = true;
-                lightTrails.mat.opacity = isJumping ? 0.3 : 0.9;
+                lightTrails.geomL.attributes.position.needsUpdate = true;
+                lightTrails.geomR.attributes.position.needsUpdate = true;
+                lightTrails.mat.opacity = isJumping ? 0.35 : 0.9;
 
-                const diff = (score * 0.0001);
-                if (Math.random() < 0.03 * speed * (isOverdrive?1.5:1) + diff) spawnObstacle();
-                if (Math.random() < 0.02) spawnCollectible();
+                // Geração equilibrada de Obstáculos e Coletáveis
+                spawnCooldownObs -= speed * dt;
+                if (spawnCooldownObs <= 0) {
+                    spawnObstacle();
+                    spawnCooldownObs = Math.max(24, 65 - speed * 4.5 + Math.random() * 25);
+                }
 
+                spawnCooldownCol -= speed * dt;
+                if (spawnCooldownCol <= 0) {
+                    spawnCollectible();
+                    spawnCooldownCol = 45 + Math.random() * 40;
+                }
+
+                // Atualização de Obstáculos
                 for (let i = entities.obstacles.length - 1; i >= 0; i--) {
-                    let obs = entities.obstacles[i];
-                    obs.position.z += speed * 3.5;
+                    const obs = entities.obstacles[i];
+                    obs.position.z += speed * 3.5 * dt;
+
                     if (obs.userData.vx !== 0) {
-                        obs.position.x += obs.userData.vx;
-                        if(obs.position.x > carMaxX - obs.userData.width/2 || obs.position.x < -carMaxX + obs.userData.width/2) obs.userData.vx *= -1;
+                        obs.position.x += obs.userData.vx * dt;
+                        const limit = CAR_MAX_X - obs.userData.width / 2;
+                        if (obs.position.x > limit || obs.position.x < -limit) {
+                            obs.userData.vx *= -1;
+                        }
                     }
+
                     obs.userData.box.setFromObject(obs);
-                    if (car.userData.box.intersectsBox(obs.userData.box)) { handleCollision(obs, i); }
-                    else if (obs.position.z > 20) { obs.visible = false; activePools.obstacles.push(obs); entities.obstacles.splice(i, 1); }
+                    if (car.userData.box.intersectsBox(obs.userData.box)) {
+                        handleCollision(obs, i);
+                    } else if (obs.position.z > 25) {
+                        obs.visible = false;
+                        pools.obstacles.push(obs);
+                        entities.obstacles.splice(i, 1);
+                    }
                 }
 
+                // Atualização de Coletáveis
                 for (let i = entities.collectibles.length - 1; i >= 0; i--) {
-                    let item = entities.collectibles[i];
-                    item.position.z += speed * 3.5;
-                    if(item.userData.type === 'ring') { item.rotation.z += 0.15; item.rotation.x += 0.08; } else { item.rotation.y += 0.4; } 
-                    item.userData.box.setFromObject(item);
+                    const item = entities.collectibles[i];
+                    item.position.z += speed * 3.5 * dt;
 
+                    if (item.userData.type === 'ring') {
+                        item.rotation.z += 0.14 * dt;
+                        item.rotation.x += 0.07 * dt;
+                    } else {
+                        item.rotation.y += 0.35 * dt;
+                    }
+
+                    item.userData.box.setFromObject(item);
                     if (car.userData.box.intersectsBox(item.userData.box)) {
                         if (item.userData.type === 'boost') {
-                            timeTravelEffect(); 
-                            isOverdrive = true; overdriveTimer = 450; invulnerableTimer = 450;
-                            ui.overdrive.classList.add('overdrive-on'); bloomPass.strength = 4.5;
-                            ui.fluxCap.classList.add('flux-active'); ui.fluxStatus.innerText = 'FLUXING'; ui.fluxStatus.style.color = '#0ff';
+                            triggerTimeTravel();
+                            isOverdrive = true;
+                            overdriveTimer = OVERDRIVE_DURATION;
+                            invulnerableTimer = OVERDRIVE_DURATION;
+                            ui.overdrive.classList.add('overdrive-on');
+                            bloomPass.strength = 3.8;
+                            ui.fluxCap.classList.add('flux-active');
+                            ui.fluxStatus.innerText = '1.21 GW!';
+                            ui.fluxStatus.style.color = '#00ffff';
                         } else {
                             score += 250 * comboMultiplier;
-                            comboMultiplier = Math.min(comboMultiplier + 1, 99); comboTimer = 300; 
+                            comboMultiplier = Math.min(comboMultiplier + 1, 99);
+                            if (comboMultiplier > maxComboReached) maxComboReached = comboMultiplier;
+                            comboTimer = 320;
                             ui.combo.innerText = `x${comboMultiplier}`;
-                            ui.combo.classList.add('combo-active'); setTimeout(() => ui.combo.classList.remove('combo-active'), 100);
+                            ui.combo.classList.add('combo-active');
+                            setTimeout(() => ui.combo.classList.remove('combo-active'), 110);
                             playSfx('coin');
                         }
-                        item.visible = false; activePools.collectibles.push(item); entities.collectibles.splice(i, 1);
+                        item.visible = false;
+                        pools.collectibles.push(item);
+                        entities.collectibles.splice(i, 1);
+                    } else if (item.position.z > 25) {
+                        item.visible = false;
+                        pools.collectibles.push(item);
+                        entities.collectibles.splice(i, 1);
                     }
-                    else if (item.position.z > 20) { item.visible = false; activePools.collectibles.push(item); entities.collectibles.splice(i, 1); }
                 }
 
-                const camTargetX = car.position.x * 0.4; camera.position.x += (camTargetX - camera.position.x) * 0.12;
-                let cx = 0, cy = 0;
-                if(screenShake > 0) { cx = (Math.random()-0.5) * screenShake; cy = (Math.random()-0.5) * screenShake; screenShake *= 0.85; if(screenShake < 0.05) screenShake = 0; }
-                const speedShake = (speed > 6 && !isJumping) ? (Math.random()-0.5)*0.2 : 0;
-                
-                camera.position.y = 5.5 + (isJumping ? car.position.y*0.4 : 0) + cy + speedShake;
-                camera.position.x += cx;
-                camera.lookAt(camTargetX * 0.25, 2.5 + (isJumping ? car.position.y*0.5 : 0), -65);
-                camera.rotation.z = -carVelocityX * 0.05;
+                // Câmara Dinâmica com Screen Shake
+                const camTargetX = car.position.x * 0.42;
+                camera.position.x += (camTargetX - camera.position.x) * 0.12 * dt;
+
+                let shakeX = 0, shakeY = 0;
+                if (screenShake > 0) {
+                    shakeX = (Math.random() - 0.5) * screenShake;
+                    shakeY = (Math.random() - 0.5) * screenShake;
+                    screenShake *= Math.pow(0.86, dt);
+                    if (screenShake < 0.04) screenShake = 0;
+                }
+                const speedVibration = (speed > 5.5 && !isJumping) ? (Math.random() - 0.5) * 0.14 : 0;
+
+                camera.position.y = 5.4 + (isJumping ? car.position.y * 0.42 : 0) + shakeY + speedVibration;
+                camera.position.x += shakeX;
+                camera.lookAt(camTargetX * 0.25, 2.4 + (isJumping ? car.position.y * 0.48 : 0), -65);
+                camera.rotation.z = -carVelocityX * 0.045;
             }
 
-            for(let i=entities.particles.length-1; i>=0; i--) {
-                let p = entities.particles[i]; p.position.add(p.userData.vel); p.userData.vel.y -= 0.3; 
-                if(p.position.y < -5) { p.visible = false; activePools.particles.push(p); entities.particles.splice(i, 1); }
+            // Partículas de Explosão
+            for (let i = entities.particles.length - 1; i >= 0; i--) {
+                const p = entities.particles[i];
+                p.position.addScaledVector(p.userData.vel, dt);
+                p.userData.vel.y -= 0.32 * dt;
+                if (p.position.y < -5) {
+                    p.visible = false;
+                    pools.particles.push(p);
+                    entities.particles.splice(i, 1);
+                }
             }
-            
-            for(let i=entities.shockwaves.length-1; i>=0; i--) {
-                let s = entities.shockwaves[i];
-                s.userData.scale += 1.5; s.scale.setScalar(s.userData.scale);
-                s.userData.life -= 0.08; s.material.opacity = s.userData.life;
-                if(s.userData.life <= 0) { scene.remove(s); entities.shockwaves.splice(i, 1); }
+
+            // Ondas de Choque
+            for (let i = entities.shockwaves.length - 1; i >= 0; i--) {
+                const s = entities.shockwaves[i];
+                s.userData.scale += 1.6 * dt;
+                s.scale.setScalar(s.userData.scale);
+                s.userData.life -= 0.07 * dt;
+                s.material.opacity = Math.max(0, s.userData.life);
+                if (s.userData.life <= 0) {
+                    scene.remove(s);
+                    entities.shockwaves.splice(i, 1);
+                }
             }
 
             composer.render();
