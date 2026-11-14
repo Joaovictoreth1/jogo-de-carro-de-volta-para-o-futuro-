@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sunset Race - DeLorean Time Machine 88 MPH</title>
-    <meta name="description" content="A derradeira experiência Synthwave 3D. Alcance as 88 MPH no icónico DeLorean com modo Hover, trilha sonora procedural e viagens no tempo.">
+    <meta name="description" content="A derradeira experiência Synthwave 3D. Alcance as 88 MPH no icónico DeLorean com modo Hover, Plutónio, Near-Miss, trilha sonora procedural e viagens no tempo.">
     
     <!-- Fontes Futuristas & Arcade -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -17,8 +17,9 @@
             --neon-blue: #00ffff;
             --neon-orange: #ffaa00;
             --neon-green: #00ff88;
+            --neon-red: #ff2255;
             --dark-bg: #02000a;
-            --glass-bg: rgba(4, 2, 16, 0.72);
+            --glass-bg: rgba(4, 2, 16, 0.76);
         }
 
         * {
@@ -64,7 +65,7 @@
             background-size: 100% 4px, 4px 100%;
             z-index: 10;
             pointer-events: none;
-            opacity: 0.55;
+            opacity: 0.52;
         }
 
         /* Flash branco de salto temporal */
@@ -104,12 +105,12 @@
         .hud-panel {
             background: var(--glass-bg);
             border: 1.5px solid var(--neon-blue);
-            box-shadow: 0 0 12px rgba(0, 255, 255, 0.25) inset, 0 4px 20px rgba(0, 0, 0, 0.6);
+            box-shadow: 0 0 12px rgba(0, 255, 255, 0.25) inset, 0 4px 20px rgba(0, 0, 0, 0.65);
             border-radius: 10px;
             padding: 10px 18px;
             backdrop-filter: blur(8px);
             display: flex;
-            gap: 22px;
+            gap: 20px;
             align-items: center;
         }
 
@@ -152,7 +153,7 @@
         #speed-display {
             color: var(--neon-orange);
             text-shadow: 0 0 12px var(--neon-orange);
-            min-width: 110px;
+            min-width: 105px;
             text-align: right;
         }
 
@@ -166,6 +167,28 @@
         .combo-active {
             transform: scale(1.35) rotate(-4deg);
             color: var(--neon-orange) !important;
+        }
+
+        /* Escudo Temporário / Integridade */
+        #shield-indicator {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: rgba(255, 255, 255, 0.4);
+            transition: all 0.25s ease;
+        }
+
+        #shield-indicator.active {
+            border-color: var(--neon-green);
+            color: var(--neon-green);
+            background: rgba(0, 255, 136, 0.12);
+            box-shadow: 0 0 12px rgba(0, 255, 136, 0.45);
         }
 
         /* Botões rápidos no HUD (Som & Pausa) */
@@ -199,7 +222,7 @@
             transform: translateY(-2px);
         }
 
-        /* Capacitor de Fluxo (Widget Ícone) */
+        /* Capacitor de Fluxo & Barra de Plutónio */
         .flux-container {
             display: flex;
             align-items: center;
@@ -218,9 +241,14 @@
             transition: border-color 0.3s, box-shadow 0.3s;
         }
 
+        .flux-ready {
+            border-color: var(--neon-orange);
+            box-shadow: inset 0 0 10px var(--neon-orange), 0 0 14px var(--neon-orange);
+        }
+
         .flux-active {
             border-color: var(--neon-blue);
-            box-shadow: inset 0 0 12px var(--neon-blue), 0 0 15px var(--neon-blue);
+            box-shadow: inset 0 0 12px var(--neon-blue), 0 0 18px var(--neon-blue);
         }
 
         .flux-tube {
@@ -234,6 +262,11 @@
         .flux-l { width: 4px; height: 18px; top: 50%; right: 50%; transform-origin: top right; transform: rotate(120deg); }
         .flux-r { width: 4px; height: 18px; top: 50%; left: 50%; transform-origin: top left; transform: rotate(-120deg); }
 
+        .flux-ready .flux-tube {
+            background: var(--neon-orange);
+            box-shadow: 0 0 8px var(--neon-orange);
+        }
+
         .flux-active .flux-tube {
             background: #fff;
             box-shadow: 0 0 8px var(--neon-blue), 0 0 16px #fff;
@@ -245,25 +278,26 @@
             to { opacity: 1; }
         }
 
-        /* Barra de Progresso do Overdrive */
+        /* Barra de Carga de Plutónio / Overdrive */
         .overdrive-bar-wrap {
-            width: 100%;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 2px;
-            margin-top: 4px;
+            width: 110px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.12);
+            border-radius: 3px;
+            margin-top: 5px;
             overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.15);
         }
 
         #overdrive-bar {
             width: 0%;
             height: 100%;
-            background: linear-gradient(90deg, var(--neon-blue), #fff);
-            box-shadow: 0 0 8px var(--neon-blue);
-            transition: width 0.05s linear;
+            background: linear-gradient(90deg, var(--neon-orange), #ffee44);
+            box-shadow: 0 0 8px var(--neon-orange);
+            transition: width 0.08s linear;
         }
 
-        /* Notificações Centrais */
+        /* Notificações Centrais & Callouts Flutuantes */
         #level-notification {
             position: absolute;
             top: 32%;
@@ -291,15 +325,41 @@
             100% { transform: translate(-50%, -50%) scale(2.2); opacity: 0; filter: blur(12px); }
         }
 
+        #callout-banner {
+            position: absolute;
+            top: 42%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: clamp(16px, 2.8vw, 28px);
+            font-weight: 900;
+            letter-spacing: 3px;
+            color: var(--neon-green);
+            text-shadow: 0 0 14px var(--neon-green), 0 0 28px #000;
+            opacity: 0;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        .callout-anim {
+            animation: calloutPop 0.95s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes calloutPop {
+            0% { transform: translate(-50%, -20%) scale(0.7); opacity: 0; }
+            25% { transform: translate(-50%, -50%) scale(1.12); opacity: 1; }
+            75% { transform: translate(-50%, -65%) scale(1); opacity: 1; }
+            100% { transform: translate(-50%, -95%) scale(0.95); opacity: 0; }
+        }
+
         #overdrive-warning {
             position: absolute;
-            top: 20%;
+            top: 19%;
             left: 50%;
             transform: translate(-50%, -50%);
             color: #fff;
-            font-size: clamp(20px, 4vw, 42px);
+            font-size: clamp(18px, 3.6vw, 38px);
             font-weight: 900;
-            letter-spacing: 6px;
+            letter-spacing: 5px;
             text-shadow: 0 0 20px #ff3300, 0 0 40px #ff3300;
             opacity: 0;
             transition: opacity 0.2s;
@@ -354,7 +414,7 @@
         h2 {
             color: var(--neon-pink);
             text-shadow: 0 0 15px var(--neon-pink);
-            margin: 10px 0 32px;
+            margin: 10px 0 30px;
             letter-spacing: 5px;
             font-size: clamp(14px, 2.5vw, 22px);
             font-weight: 800;
@@ -389,18 +449,18 @@
         }
 
         .instruction-card {
-            font-size: clamp(11px, 1.6vw, 14px);
-            color: rgba(255, 255, 255, 0.8);
-            margin-top: 32px;
+            font-size: clamp(11px, 1.5vw, 13.5px);
+            color: rgba(255, 255, 255, 0.85);
+            margin-top: 28px;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
-            line-height: 1.8;
-            background: rgba(10, 5, 25, 0.75);
+            letter-spacing: 1.4px;
+            line-height: 1.85;
+            background: rgba(10, 5, 25, 0.78);
             padding: 18px 28px;
             border-radius: 12px;
             border: 1px solid rgba(0, 255, 255, 0.3);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-            max-width: 560px;
+            max-width: 600px;
         }
 
         .highlight {
@@ -415,6 +475,12 @@
             text-shadow: 0 0 6px rgba(0, 255, 255, 0.6);
         }
 
+        .highlight-orange {
+            color: var(--neon-orange);
+            font-weight: 800;
+            text-shadow: 0 0 6px rgba(255, 170, 0, 0.6);
+        }
+
         /* Estatísticas do Fim de Jogo */
         .stats-grid {
             display: grid;
@@ -426,7 +492,7 @@
             border-radius: 12px;
             padding: 18px 25px;
             width: 100%;
-            max-width: 500px;
+            max-width: 520px;
         }
 
         .stat-box {
@@ -455,10 +521,10 @@
             bottom: 0;
             left: 0;
             width: 100%;
-            height: 45%;
+            height: 44%;
             display: none;
             z-index: 25;
-            padding: 16px;
+            padding: 14px;
             gap: 10px;
             pointer-events: none;
         }
@@ -472,42 +538,63 @@
         .touch-btn {
             flex: 1;
             height: 100%;
-            border: 1.5px dashed rgba(255, 255, 255, 0.18);
+            border: 1.5px dashed rgba(255, 255, 255, 0.2);
             border-radius: 14px;
             display: flex;
             align-items: flex-end;
             justify-content: center;
-            padding-bottom: 18px;
-            color: rgba(255, 255, 255, 0.35);
-            font-size: 20px;
+            padding-bottom: 16px;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 18px;
             font-weight: 700;
             pointer-events: auto;
-            background: linear-gradient(to top, rgba(0, 255, 255, 0.04), transparent);
+            background: linear-gradient(to top, rgba(0, 255, 255, 0.05), transparent);
             transition: all 0.1s;
         }
 
         .touch-btn:active {
-            background: linear-gradient(to top, rgba(0, 255, 255, 0.22), transparent);
+            background: linear-gradient(to top, rgba(0, 255, 255, 0.25), transparent);
             border-color: var(--neon-blue);
             color: var(--neon-blue);
         }
 
+        .touch-center-col {
+            flex: 1.35;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            height: 100%;
+        }
+
         .touch-jump {
-            flex: 1.4;
-            font-size: 18px;
+            flex: 1;
+            font-size: 16px;
             text-align: center;
             line-height: 1.2;
+            align-items: center;
+            padding-bottom: 0;
+        }
+
+        .touch-boost {
+            height: 36%;
+            font-size: 13px;
+            letter-spacing: 1px;
+            align-items: center;
+            padding-bottom: 0;
+            border-color: rgba(255, 170, 0, 0.35);
+            color: rgba(255, 170, 0, 0.6);
         }
 
         @media (max-width: 768px) {
             #ui-layer { padding: 12px; }
-            .hud-panel { padding: 8px 12px; gap: 12px; }
+            .hud-panel { padding: 8px 12px; gap: 10px; }
             .hud-value { font-size: 22px; }
             #highscore-display { font-size: 18px; }
             .hud-label { font-size: 9px; letter-spacing: 1px; }
             .flux-box { width: 28px; height: 36px; }
             .flux-y { height: 11px; }
             .flux-l, .flux-r { height: 13px; }
+            .overdrive-bar-wrap { width: 76px; }
             .stats-grid { grid-template-columns: 1fr; gap: 10px; }
         }
     </style>
@@ -532,13 +619,17 @@
     <!-- Controles Táteis para Telemóveis/Tablets -->
     <div id="mobile-controls">
         <div class="touch-btn" id="touch-left">◀</div>
-        <div class="touch-btn touch-jump" id="touch-jump">HOVER<br>▲</div>
+        <div class="touch-center-col">
+            <div class="touch-btn touch-jump" id="touch-jump">HOVER ▲</div>
+            <div class="touch-btn touch-boost" id="touch-boost">88 MPH ⚡</div>
+        </div>
         <div class="touch-btn" id="touch-right">▶</div>
     </div>
 
     <!-- HUD Principal -->
     <div id="ui-layer">
         <div id="level-notification">2015 ERA</div>
+        <div id="callout-banner">NEAR MISS +150</div>
         <div id="overdrive-warning">TIME TRAVEL: 88 MPH!!</div>
 
         <div class="hud-top">
@@ -560,8 +651,8 @@
             <div style="display: flex; align-items: center; gap: 10px;">
                 <div class="hud-panel flux-container">
                     <div class="hud-element" style="text-align: right;">
-                        <span class="hud-label">CAPACITOR</span>
-                        <span class="hud-value" id="flux-status" style="color: #666; font-size: 18px;">STANDBY</span>
+                        <span class="hud-label">PLUTÓNIO / FLUXO</span>
+                        <span class="hud-value" id="flux-status" style="color: #888; font-size: 18px;">0%</span>
                         <div class="overdrive-bar-wrap">
                             <div id="overdrive-bar"></div>
                         </div>
@@ -586,6 +677,7 @@
                     <span class="hud-label">DESTINO TEMPORAL</span>
                     <span class="hud-value" id="level-display" style="color: var(--neon-blue);">1985</span>
                 </div>
+                <div id="shield-indicator">🛡 ESCUDO</div>
             </div>
             <div class="hud-panel">
                 <div class="hud-element">
@@ -604,7 +696,8 @@
         <div class="instruction-card">
             <span class="highlight">[A] / [D]</span> ou <span class="highlight">[Setas]</span> (ou deslizar) para Conduzir<br>
             <span class="highlight">[ESPAÇO] / [W] / [▲]</span> para ativar o <span class="highlight-cyan">Modo Hover (Saltar)</span><br>
-            Apanhe Anéis para multiplicar o <span class="highlight">Combo</span> e Pirâmides Laranja para atingir <span class="highlight-cyan">88 MPH</span>!
+            <span class="highlight-orange">[SHIFT] / [E]</span> quando o Plutónio atingir 100% para disparar <span class="highlight-cyan">88 MPH</span>!<br>
+            Passe rente aos obstáculos (<span class="highlight">Near-Miss</span>) e apanhe <span class="highlight-cyan">Escudos</span> para sobreviver!
         </div>
     </div>
 
@@ -651,22 +744,22 @@
         // 1. CONFIGURAÇÃO DE ERAS TEMPORAIS (Paletas de Cores & Atmosfera)
         // ============================================================================
         const ERAS = [
-            { name: "1985", label: "OUTRUN 1985", sun: ['#ffdd00', '#ff0066', '#2a0066'], fog: 0x050014, grid: 0xff00ff, acc: 0x00ffff, bld: 0x08001a },
-            { name: "2015", label: "FUTURE 2015", sun: ['#00ffff', '#0066ff', '#000833'], fog: 0x00081c, grid: 0x00ffff, acc: 0xff0077, bld: 0x000a24 },
-            { name: "1955", label: "CLASSIC 1955", sun: ['#ffee44', '#ff6600', '#440000'], fog: 0x180400, grid: 0xffaa00, acc: 0xff3300, bld: 0x1a0500 },
-            { name: "2077", label: "CYBER 2077",  sun: ['#aaffcc', '#00ff88', '#002218'], fog: 0x00120a, grid: 0x00ff88, acc: 0xff00ff, bld: 0x001a0e },
-            { name: "1885", label: "FRONTIER 1885",sun: ['#ffffff', '#ffbb66', '#331100'], fog: 0x1a0c04, grid: 0xffcc66, acc: 0x00ffff, bld: 0x140802 }
+            { name: "1985", label: "OUTRUN 1985",   sun: ['#ffdd00', '#ff0066', '#2a0066'], fog: 0x050014, grid: 0xff00ff, acc: 0x00ffff, bld: 0x08001a },
+            { name: "2015", label: "FUTURE 2015",   sun: ['#00ffff', '#0066ff', '#000833'], fog: 0x00081c, grid: 0x00ffff, acc: 0xff0077, bld: 0x000a24 },
+            { name: "1955", label: "CLASSIC 1955",  sun: ['#ffee44', '#ff6600', '#440000'], fog: 0x180400, grid: 0xffaa00, acc: 0xff3300, bld: 0x1a0500 },
+            { name: "2077", label: "CYBER 2077",    sun: ['#aaffcc', '#00ff88', '#002218'], fog: 0x00120a, grid: 0x00ff88, acc: 0xff00ff, bld: 0x001a0e },
+            { name: "1885", label: "FRONTIER 1885", sun: ['#ffffff', '#ffbb66', '#331100'], fog: 0x1a0c04, grid: 0xffcc66, acc: 0x00ffff, bld: 0x140802 }
         ];
 
         // ============================================================================
         // 2. ESTADO GLOBAL & FÍSICA
         // ============================================================================
         let scene, camera, renderer, composer, bloomPass;
-        let car, gridHelper, terrain, sunMesh, starfield, cityscape, timeTunnel;
-        let lightningLight, carUnderGlow;
+        let car, gridHelper, terrain, sunMesh, starfield, cityscape, timeTunnel, speedLines;
+        let lightningLight, carUnderGlow, shieldDome;
         let lightTrails = { left: [], right: [], geomL: null, geomR: null, mat: null };
 
-        // Listas de entidades ativas e Object Pools (zero garbage collection em jogo)
+        // Listas de entidades ativas e Object Pools
         const entities = { obstacles: [], collectibles: [], particles: [], shockwaves: [], fireTrails: [] };
         const pools = { obstacles: [], collectibles: [], particles: [], fireTrails: [] };
 
@@ -679,27 +772,30 @@
 
         // Velocidades e Física (Normalizadas por Delta Time a 60 FPS)
         let speed = 1.2;
-        const BASE_SPEED = 1.3;
-        const MAX_SPEED_NORMAL = 7.5;
-        const SPEED_OVERDRIVE = 15.5;
+        const BASE_SPEED = 1.35;
+        const MAX_SPEED_NORMAL = 7.8;
+        const SPEED_OVERDRIVE = 16.0;
 
         let moveLeft = false, moveRight = false;
         let carVelocityX = 0;
         let isJumping = false, carVelocityY = 0;
-        const CAR_ACCEL = 0.24;
+        const CAR_ACCEL = 0.25;
         const CAR_FRICTION = 0.78;
         const CAR_MAX_X = 14.5;
         const GRAVITY = 0.026;
-        const JUMP_STRENGTH = 0.58;
+        const JUMP_STRENGTH = 0.60;
 
+        let hasShield = false;
         let invulnerableTimer = 0;
         let isOverdrive = false;
         let overdriveTimer = 0;
+        let plutoniumCharge = 0; // 0 a 100%
         const OVERDRIVE_DURATION = 480; // ~8 segundos a 60fps
 
         let comboMultiplier = 1;
         let comboTimer = 0;
         let screenShake = 0;
+        let hitstopTimer = 0;
         let spawnCooldownObs = 0;
         let spawnCooldownCol = 0;
 
@@ -715,9 +811,11 @@
             overdrive: document.getElementById('overdrive-warning'),
             overdriveBar: document.getElementById('overdrive-bar'),
             notification: document.getElementById('level-notification'),
+            callout: document.getElementById('callout-banner'),
             flash: document.getElementById('time-flash'),
             fluxCap: document.getElementById('flux-capacitor'),
             fluxStatus: document.getElementById('flux-status'),
+            shieldInd: document.getElementById('shield-indicator'),
             muteBtn: document.getElementById('mute-btn'),
             pauseBtn: document.getElementById('pause-btn')
         };
@@ -731,12 +829,15 @@
             obsMatWire: new THREE.MeshBasicMaterial({ wireframe: true, transparent: true, opacity: 0.95 }),
             ringGeo: new THREE.TorusGeometry(1.4, 0.32, 10, 24),
             ringMat: new THREE.MeshStandardMaterial({ color: 0x000000, emissive: ERAS[0].acc, emissiveIntensity: 4.5 }),
-            boostGeo: new THREE.OctahedronGeometry(2.1, 0),
+            boostGeo: new THREE.OctahedronGeometry(2.0, 0),
             boostMat: new THREE.MeshStandardMaterial({ color: 0x000000, emissive: 0xff6600, emissiveIntensity: 6, wireframe: true }),
             boostCoreMat: new THREE.MeshBasicMaterial({ color: 0xffcc00 }),
+            shieldGeo: new THREE.IcosahedronGeometry(1.6, 1),
+            shieldMat: new THREE.MeshStandardMaterial({ color: 0x000000, emissive: 0x00ff88, emissiveIntensity: 4.5, wireframe: true }),
             partGeo: new THREE.BoxGeometry(0.65, 0.65, 0.65),
             partMatCrash: new THREE.MeshBasicMaterial({ color: 0xffaa00 }),
             partMatBoost: new THREE.MeshBasicMaterial({ color: 0x00ffff }),
+            partMatShield: new THREE.MeshBasicMaterial({ color: 0x00ff88 }),
             fireGeo: new THREE.PlaneGeometry(1.1, 9),
             fireMat: new THREE.MeshBasicMaterial({ color: 0xff5500, transparent: true, opacity: 0.95, blending: THREE.AdditiveBlending, depthWrite: false })
         };
@@ -821,6 +922,27 @@
                     osc.stop(t + 0.25);
                     break;
 
+                case 'nearmiss':
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(520, t);
+                    osc.frequency.exponentialRampToValueAtTime(1180, t + 0.14);
+                    gain.gain.setValueAtTime(0.22, t);
+                    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
+                    osc.start(t);
+                    osc.stop(t + 0.18);
+                    break;
+
+                case 'shield':
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(440, t);
+                    osc.frequency.setValueAtTime(660, t + 0.08);
+                    osc.frequency.setValueAtTime(880, t + 0.16);
+                    gain.gain.setValueAtTime(0.26, t);
+                    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+                    osc.start(t);
+                    osc.stop(t + 0.35);
+                    break;
+
                 case 'jump':
                     osc.type = 'sawtooth';
                     osc.frequency.setValueAtTime(140, t);
@@ -849,7 +971,6 @@
                     break;
 
                 case 'time_travel':
-                    // Estrondo sônico + varredura de frequência futurista
                     osc.type = 'sawtooth';
                     osc.frequency.setValueAtTime(60, t);
                     osc.frequency.exponentialRampToValueAtTime(2800, t + 0.7);
@@ -1029,9 +1150,9 @@
             const mat = new THREE.MeshStandardMaterial({
                 color: ERAS[currentEraIndex].bld,
                 emissive: ERAS[currentEraIndex].grid,
-                emissiveIntensity: 0.08,
-                roughness: 0.7,
-                metalness: 0.4
+                emissiveIntensity: 0.12,
+                roughness: 0.65,
+                metalness: 0.45
             });
 
             cityscape = new THREE.InstancedMesh(geom, mat, 500);
@@ -1051,6 +1172,37 @@
                 cityscape.setMatrixAt(i, dummy.matrix);
             }
             scene.add(cityscape);
+        }
+
+        function buildSpeedLines() {
+            const count = 180;
+            const geom = new THREE.BufferGeometry();
+            const positions = new Float32Array(count * 6);
+            for (let i = 0; i < count; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const radius = 14 + Math.random() * 26;
+                const x = Math.cos(angle) * radius;
+                const y = 3 + Math.sin(angle) * (radius * 0.65);
+                const z = -Math.random() * 400;
+                const len = 12 + Math.random() * 24;
+
+                positions[i * 6] = x;
+                positions[i * 6 + 1] = Math.max(0.5, y);
+                positions[i * 6 + 2] = z;
+
+                positions[i * 6 + 3] = x;
+                positions[i * 6 + 4] = Math.max(0.5, y);
+                positions[i * 6 + 5] = z + len;
+            }
+            geom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            const mat = new THREE.LineBasicMaterial({
+                color: 0x00ffff,
+                transparent: true,
+                opacity: 0,
+                blending: THREE.AdditiveBlending
+            });
+            speedLines = new THREE.LineSegments(geom, mat);
+            scene.add(speedLines);
         }
 
         function buildDeLorean() {
@@ -1138,13 +1290,27 @@
             tL.add(new THREE.Mesh(tGlowGeo, fluxGlowMat));
             tR.add(new THREE.Mesh(tGlowGeo, fluxGlowMat));
 
+            // Domo de Escudo Energético
+            shieldDome = new THREE.Mesh(
+                new THREE.SphereGeometry(2.9, 24, 16),
+                new THREE.MeshBasicMaterial({
+                    color: 0x00ff88,
+                    wireframe: true,
+                    transparent: true,
+                    opacity: 0,
+                    blending: THREE.AdditiveBlending
+                })
+            );
+            shieldDome.scale.set(0.65, 0.42, 1.35);
+            shieldDome.position.set(0, 0.75, -0.4);
+
             // Luz Néon sob o carro (Underglow)
             carUnderGlow = new THREE.PointLight(0x00ffff, 3, 12);
             carUnderGlow.position.set(0, 0.3, 0);
 
             car.add(
                 body, hood, fBumper, rBumper, hlL, hlR, cabin, roof, louvers,
-                tail, fluxFront, fluxL, fluxR, reactorBase, mrFusion, tL, tR, carUnderGlow
+                tail, fluxFront, fluxL, fluxR, reactorBase, mrFusion, tL, tR, shieldDome, carUnderGlow
             );
 
             // Rodas articuláveis para o Modo Hover
@@ -1285,6 +1451,7 @@
             scene.add(terrain);
 
             buildCityscape();
+            buildSpeedLines();
 
             // Túnel de Dobra Temporal (Wormhole)
             const tunnelGeo = new THREE.CylinderGeometry(52, 16, 2000, 32, 20, true);
@@ -1333,8 +1500,72 @@
         // ============================================================================
         // 5. SPAWNING & OBJECT POOLING
         // ============================================================================
+        function showCallout(text, color = 'var(--neon-green)') {
+            ui.callout.innerText = text;
+            ui.callout.style.color = color;
+            ui.callout.style.textShadow = `0 0 14px ${color}, 0 0 28px #000`;
+            ui.callout.classList.remove('callout-anim');
+            void ui.callout.offsetWidth;
+            ui.callout.classList.add('callout-anim');
+        }
+
+        function updatePlutoniumUI() {
+            if (isOverdrive) {
+                ui.fluxStatus.innerText = '1.21 GW!';
+                ui.fluxStatus.style.color = '#00ffff';
+                ui.fluxCap.classList.remove('flux-ready');
+                ui.fluxCap.classList.add('flux-active');
+                return;
+            }
+            const pct = Math.min(100, Math.floor(plutoniumCharge));
+            ui.overdriveBar.style.width = `${pct}%`;
+            if (pct >= 100) {
+                ui.fluxStatus.innerText = 'PRONTO!';
+                ui.fluxStatus.style.color = '#ffaa00';
+                ui.fluxCap.classList.add('flux-ready');
+            } else {
+                ui.fluxStatus.innerText = `${pct}%`;
+                ui.fluxStatus.style.color = '#aaa';
+                ui.fluxCap.classList.remove('flux-ready', 'flux-active');
+            }
+        }
+
+        function addPlutonium(amount) {
+            if (isOverdrive) return;
+            const wasReady = plutoniumCharge >= 100;
+            plutoniumCharge = Math.min(100, plutoniumCharge + amount);
+            updatePlutoniumUI();
+            if (!wasReady && plutoniumCharge >= 100) {
+                showCallout('CAPACITOR PRONTO! [SHIFT / E]', 'var(--neon-orange)');
+                playSfx('shield');
+            }
+        }
+
+        function activateManualOverdrive() {
+            if (isOverdrive || plutoniumCharge < 100 || gameState !== 'PLAYING') return;
+            plutoniumCharge = 0;
+            triggerTimeTravel();
+            isOverdrive = true;
+            overdriveTimer = OVERDRIVE_DURATION;
+            invulnerableTimer = OVERDRIVE_DURATION;
+            ui.overdrive.classList.add('overdrive-on');
+            bloomPass.strength = 3.8;
+            updatePlutoniumUI();
+        }
+
+        function setShield(active) {
+            hasShield = active;
+            if (active) {
+                ui.shieldInd.classList.add('active');
+                shieldDome.material.opacity = 0.35;
+            } else {
+                ui.shieldInd.classList.remove('active');
+                shieldDome.material.opacity = 0;
+            }
+        }
+
         function spawnObstacle() {
-            const isMoving = Math.random() < (0.12 + currentEraIndex * 0.07);
+            const isMoving = Math.random() < (0.14 + currentEraIndex * 0.07);
             const width = isMoving ? 4.2 : (Math.random() > 0.72 ? 11.5 : 4.2);
             const color = isMoving ? ERAS[currentEraIndex].acc : (width > 5 ? 0xffaa00 : 0xff0055);
 
@@ -1359,14 +1590,15 @@
             obs.userData = {
                 box: new THREE.Box3(),
                 vx: isMoving ? (Math.random() > 0.5 ? 1 : -1) * (0.18 + currentEraIndex * 0.04) : 0,
-                width: width
+                width: width,
+                nearMissed: false
             };
             entities.obstacles.push(obs);
         }
 
         function spawnCollectible() {
-            const isBoost = Math.random() > 0.90;
-            const targetType = isBoost ? 'boost' : 'ring';
+            const roll = Math.random();
+            const targetType = roll > 0.90 ? 'boost' : (roll > 0.81 && !hasShield ? 'shield' : 'ring');
 
             let item = null;
             const idx = pools.collectibles.findIndex(i => i.userData.type === targetType);
@@ -1374,12 +1606,15 @@
                 item = pools.collectibles.splice(idx, 1)[0];
                 item.visible = true;
             } else {
-                if (isBoost) {
+                if (targetType === 'boost') {
                     item = new THREE.Group();
                     const outer = new THREE.Mesh(sharedAssets.boostGeo, sharedAssets.boostMat);
                     const core = new THREE.Mesh(new THREE.OctahedronGeometry(1.0, 0), sharedAssets.boostCoreMat);
                     item.add(outer, core);
                     item.userData = { type: 'boost' };
+                } else if (targetType === 'shield') {
+                    item = new THREE.Mesh(sharedAssets.shieldGeo, sharedAssets.shieldMat);
+                    item.userData = { type: 'shield' };
                 } else {
                     item = new THREE.Mesh(sharedAssets.ringGeo, sharedAssets.ringMat);
                     item.rotation.y = Math.PI / 2;
@@ -1408,9 +1643,12 @@
             entities.shockwaves.push(wave);
         }
 
-        function triggerExplosion(pos, isBoost) {
-            createShockwave(pos, isBoost ? 0x00ffff : 0xffaa00);
-            const mat = isBoost ? sharedAssets.partMatBoost : sharedAssets.partMatCrash;
+        function triggerExplosion(pos, colorType = 'crash') {
+            const waveColor = colorType === 'boost' ? 0x00ffff : (colorType === 'shield' ? 0x00ff88 : 0xffaa00);
+            createShockwave(pos, waveColor);
+            const mat = colorType === 'boost'
+                ? sharedAssets.partMatBoost
+                : (colorType === 'shield' ? sharedAssets.partMatShield : sharedAssets.partMatCrash);
 
             for (let i = 0; i < 28; i++) {
                 let p;
@@ -1467,6 +1705,10 @@
                     toggleMute();
                     return;
                 }
+                if ((e.key === 'Shift' || e.key === 'e' || e.key === 'E') && gameState === 'PLAYING') {
+                    activateManualOverdrive();
+                    return;
+                }
 
                 setMove(e.key, true);
                 if ((e.key === ' ' || e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') && !isJumping && gameState === 'PLAYING') {
@@ -1490,6 +1732,11 @@
                 if (!isJumping && gameState === 'PLAYING') doJump();
             }, { passive: false });
 
+            document.getElementById('touch-boost').addEventListener('touchstart', e => {
+                e.preventDefault();
+                if (gameState === 'PLAYING') activateManualOverdrive();
+            }, { passive: false });
+
             // Suporte a Swipe em qualquer lugar do ecrã
             let touchStartX = 0, touchStartY = 0;
             window.addEventListener('touchstart', e => {
@@ -1505,6 +1752,8 @@
                 const dy = e.changedTouches[0].clientY - touchStartY;
                 if (dy < -45 && Math.abs(dy) > Math.abs(dx) && !isJumping) {
                     doJump();
+                } else if (dy > 45 && Math.abs(dy) > Math.abs(dx)) {
+                    activateManualOverdrive();
                 }
             }, { passive: true });
 
@@ -1614,19 +1863,19 @@
             isOverdrive = false;
             invulnerableTimer = 0;
             overdriveTimer = 0;
+            plutoniumCharge = 0;
             comboMultiplier = 1;
             comboTimer = 0;
             screenShake = 0;
+            hitstopTimer = 0;
+            setShield(false);
 
             ui.combo.innerText = 'x1';
             ui.combo.classList.remove('combo-active');
             ui.overdrive.classList.remove('overdrive-on');
-            ui.overdriveBar.style.width = '0%';
             ui.level.innerText = '1985';
             ui.level.style.color = 'var(--neon-blue)';
-            ui.fluxCap.classList.remove('flux-active');
-            ui.fluxStatus.innerText = 'STANDBY';
-            ui.fluxStatus.style.color = '#666';
+            updatePlutoniumUI();
 
             bloomPass.strength = 1.9;
             const initialEra = ERAS[0];
@@ -1664,25 +1913,36 @@
         function resumeGame() {
             if (gameState !== 'PAUSED') return;
             document.getElementById('pause-screen').classList.add('hidden');
-            clock.getDelta(); // Evita salto de delta time após pausa
+            clock.getDelta();
             gameState = 'PLAYING';
             if (engineGain && audioCtx) engineGain.gain.setTargetAtTime(0.14, audioCtx.currentTime, 0.05);
         }
 
         function handleCollision(obs, index) {
             if (isOverdrive) {
-                // Em 88 MPH o DeLorean destrói tudo no caminho!
-                triggerExplosion(obs.position, true);
+                triggerExplosion(obs.position, 'boost');
                 score += 500 * comboMultiplier;
                 obs.visible = false;
                 pools.obstacles.push(obs);
                 entities.obstacles.splice(index, 1);
                 playSfx('crash');
                 screenShake = 1.1;
+            } else if (hasShield) {
+                setShield(false);
+                invulnerableTimer = 75;
+                hitstopTimer = 4;
+                screenShake = 1.6;
+                triggerExplosion(obs.position, 'shield');
+                obs.visible = false;
+                pools.obstacles.push(obs);
+                entities.obstacles.splice(index, 1);
+                playSfx('crash');
+                showCallout('ESCUDO ABSORVEU IMPACTO!', 'var(--neon-green)');
             } else if (invulnerableTimer <= 0) {
-                screenShake = 2.4;
+                screenShake = 2.6;
+                hitstopTimer = 6;
                 gameState = 'GAMEOVER';
-                triggerExplosion(car.position, false);
+                triggerExplosion(car.position, 'crash');
                 car.visible = false;
                 car.userData.shadow.visible = false;
                 playSfx('crash');
@@ -1702,7 +1962,7 @@
                     document.getElementById('final-combo').innerText = `x${maxComboReached}`;
                     document.getElementById('final-jumps').innerText = timeJumpsCount;
                     document.getElementById('game-over-screen').classList.remove('hidden');
-                }, 1800);
+                }, 1700);
             }
         }
 
@@ -1710,11 +1970,17 @@
         // 8. LOOP PRINCIPAL DE SIMULAÇÃO (Delta-Time Normalizado)
         // ============================================================================
         function mainLoop() {
-            // Normaliza o passo de tempo para 60 FPS (dt = 1.0 a 60Hz)
             const rawDelta = Math.min(clock.getDelta(), 0.05);
             const dt = rawDelta * 60;
 
             if (gameState === 'PAUSED') {
+                composer.render();
+                return;
+            }
+
+            // Efeito Hitstop para impactos cinematográficos
+            if (hitstopTimer > 0) {
+                hitstopTimer -= dt;
                 composer.render();
                 return;
             }
@@ -1737,6 +2003,24 @@
             }
             pAttr.needsUpdate = true;
 
+            // Linhas de Velocidade (Speed Lines) em alta velocidade ou Overdrive
+            const speedRatio = Math.max(0, (simSpeed - 4.2) / (SPEED_OVERDRIVE - 4.2));
+            speedLines.material.opacity = THREE.MathUtils.lerp(speedLines.material.opacity, isOverdrive ? 0.65 : speedRatio * 0.35, 0.1 * dt);
+            if (speedLines.material.opacity > 0.02) {
+                const slAttr = speedLines.geometry.attributes.position;
+                for (let i = 2; i < slAttr.array.length; i += 6) {
+                    slAttr.array[i] += simSpeed * 12 * dt;
+                    slAttr.array[i + 3] += simSpeed * 12 * dt;
+                    if (slAttr.array[i] > 30) {
+                        const zReset = -380 - Math.random() * 60;
+                        const len = 14 + Math.random() * 24;
+                        slAttr.array[i] = zReset;
+                        slAttr.array[i + 3] = zReset + len;
+                    }
+                }
+                slAttr.needsUpdate = true;
+            }
+
             // Atualiza Rastros de Fogo no Asfalto
             for (let i = entities.fireTrails.length - 1; i >= 0; i--) {
                 const f = entities.fireTrails[i];
@@ -1757,7 +2041,13 @@
             }
 
             if (gameState === 'PLAYING') {
-                // Invulnerabilidade pós-overdrive
+                // Pulso do Escudo ativo
+                if (hasShield) {
+                    shieldDome.rotation.y += 0.04 * dt;
+                    shieldDome.material.opacity = 0.28 + Math.sin(Date.now() * 0.008) * 0.12;
+                }
+
+                // Invulnerabilidade pós-impacto/overdrive
                 if (invulnerableTimer > 0) {
                     invulnerableTimer -= dt;
                     car.visible = isOverdrive ? true : (Math.floor(invulnerableTimer) % 8 < 4);
@@ -1783,14 +2073,11 @@
 
                     if (overdriveTimer <= 0) {
                         isOverdrive = false;
-                        invulnerableTimer = 60; // 1 segundo de proteção extra ao sair do salto
+                        invulnerableTimer = 60;
                         ui.overdrive.classList.remove('overdrive-on');
-                        ui.fluxCap.classList.remove('flux-active');
-                        ui.fluxStatus.innerText = 'STANDBY';
-                        ui.fluxStatus.style.color = '#666';
-                        ui.overdriveBar.style.width = '0%';
                         bloomPass.strength = 1.9;
                         starfield.material.size = 0.9;
+                        updatePlutoniumUI();
                     }
                 } else {
                     const targetSpeed = Math.min(MAX_SPEED_NORMAL, BASE_SPEED + (score * 0.00016));
@@ -1857,7 +2144,7 @@
                 car.userData.shadow.material.opacity = isJumping ? 0.28 : 0.9;
 
                 car.userData.box.setFromObject(car);
-                car.userData.box.expandByScalar(-0.42);
+                car.userData.box.expandByScalar(-0.44);
 
                 // Atualização dos Light Trails
                 const tl = lightTrails.left, tr = lightTrails.right;
@@ -1894,10 +2181,10 @@
                 spawnCooldownCol -= speed * dt;
                 if (spawnCooldownCol <= 0) {
                     spawnCollectible();
-                    spawnCooldownCol = 45 + Math.random() * 40;
+                    spawnCooldownCol = 42 + Math.random() * 38;
                 }
 
-                // Atualização de Obstáculos
+                // Atualização de Obstáculos + Deteção de Near-Miss
                 for (let i = entities.obstacles.length - 1; i >= 0; i--) {
                     const obs = entities.obstacles[i];
                     obs.position.z += speed * 3.5 * dt;
@@ -1913,10 +2200,26 @@
                     obs.userData.box.setFromObject(obs);
                     if (car.userData.box.intersectsBox(obs.userData.box)) {
                         handleCollision(obs, i);
-                    } else if (obs.position.z > 25) {
-                        obs.visible = false;
-                        pools.obstacles.push(obs);
-                        entities.obstacles.splice(i, 1);
+                    } else {
+                        // Near-Miss: passar muito perto lateralmente ou sobrevoar em Hover
+                        if (!obs.userData.nearMissed && !isOverdrive && obs.position.z > -1.5 && obs.position.z < 3.5) {
+                            const lateralDist = Math.abs(car.position.x - obs.position.x) - (obs.userData.width * 0.5 + 1.25);
+                            const jumpedOver = isJumping && car.position.y > 2.1 && lateralDist < 0.8;
+                            if ((lateralDist >= 0 && lateralDist < 1.65) || jumpedOver) {
+                                obs.userData.nearMissed = true;
+                                const bonus = 150 * comboMultiplier;
+                                score += bonus;
+                                addPlutonium(12);
+                                playSfx('nearmiss');
+                                showCallout(jumpedOver ? `HOVER OVER +${bonus}!` : `NEAR MISS +${bonus}!`, 'var(--neon-cyan, #00ffff)');
+                            }
+                        }
+
+                        if (obs.position.z > 25) {
+                            obs.visible = false;
+                            pools.obstacles.push(obs);
+                            entities.obstacles.splice(i, 1);
+                        }
                     }
                 }
 
@@ -1928,6 +2231,9 @@
                     if (item.userData.type === 'ring') {
                         item.rotation.z += 0.14 * dt;
                         item.rotation.x += 0.07 * dt;
+                    } else if (item.userData.type === 'shield') {
+                        item.rotation.y += 0.12 * dt;
+                        item.rotation.x += 0.08 * dt;
                     } else {
                         item.rotation.y += 0.35 * dt;
                     }
@@ -1937,18 +2243,23 @@
                         if (item.userData.type === 'boost') {
                             triggerTimeTravel();
                             isOverdrive = true;
+                            plutoniumCharge = 0;
                             overdriveTimer = OVERDRIVE_DURATION;
                             invulnerableTimer = OVERDRIVE_DURATION;
                             ui.overdrive.classList.add('overdrive-on');
                             bloomPass.strength = 3.8;
-                            ui.fluxCap.classList.add('flux-active');
-                            ui.fluxStatus.innerText = '1.21 GW!';
-                            ui.fluxStatus.style.color = '#00ffff';
+                            updatePlutoniumUI();
+                        } else if (item.userData.type === 'shield') {
+                            setShield(true);
+                            score += 300 * comboMultiplier;
+                            playSfx('shield');
+                            showCallout('ESCUDO TEMPORAL ATIVO!', 'var(--neon-green)');
                         } else {
                             score += 250 * comboMultiplier;
                             comboMultiplier = Math.min(comboMultiplier + 1, 99);
                             if (comboMultiplier > maxComboReached) maxComboReached = comboMultiplier;
                             comboTimer = 320;
+                            addPlutonium(16);
                             ui.combo.innerText = `x${comboMultiplier}`;
                             ui.combo.classList.add('combo-active');
                             setTimeout(() => ui.combo.classList.remove('combo-active'), 110);
