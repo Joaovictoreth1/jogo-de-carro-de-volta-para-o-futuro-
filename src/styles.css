@@ -1,0 +1,776 @@
+:root {
+    --neon-pink: #ff00ff;
+    --neon-blue: #00ffff;
+    --neon-orange: #ffaa00;
+    --neon-green: #00ff88;
+    --neon-red: #ff2255;
+    --dark-bg: #02000a;
+    --glass-bg: rgba(4, 2, 16, 0.76);
+}
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body,
+html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: var(--dark-bg);
+    font-family: 'Orbitron', sans-serif;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+#game-container {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+}
+
+/* Vinheta cinematográfica */
+#vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle, rgba(0, 0, 0, 0) 45%, rgba(0, 0, 0, 0.85) 100%);
+    z-index: 5;
+    pointer-events: none;
+}
+
+/* Efeito CRT Scanlines sutil e otimizado */
+#crt-overlay {
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.22) 50%),
+        linear-gradient(90deg, rgba(255, 0, 0, 0.04), rgba(0, 255, 0, 0.015), rgba(0, 0, 255, 0.04));
+    background-size:
+        100% 4px,
+        4px 100%;
+    z-index: 10;
+    pointer-events: none;
+    opacity: 0.52;
+}
+
+/* Flash branco de salto temporal */
+#time-flash {
+    position: absolute;
+    inset: 0;
+    background-color: #ffffff;
+    z-index: 15;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Camada de Interface (HUD) */
+#ui-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    pointer-events: none;
+    padding: 18px 22px;
+}
+
+.hud-top,
+.hud-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
+    gap: 12px;
+}
+
+.hud-bottom {
+    align-items: flex-end;
+}
+
+.hud-panel {
+    background: var(--glass-bg);
+    border: 1.5px solid var(--neon-blue);
+    box-shadow:
+        0 0 12px rgba(0, 255, 255, 0.25) inset,
+        0 4px 20px rgba(0, 0, 0, 0.65);
+    border-radius: 10px;
+    padding: 10px 18px;
+    backdrop-filter: blur(8px);
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.hud-element {
+    display: flex;
+    flex-direction: column;
+}
+
+.hud-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--neon-blue);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 2px;
+    opacity: 0.85;
+}
+
+.hud-value {
+    font-size: 30px;
+    font-weight: 900;
+    color: #fff;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+    font-family: 'VT323', monospace;
+    letter-spacing: 2px;
+    line-height: 1;
+}
+
+#score-display {
+    color: var(--neon-pink);
+    text-shadow:
+        0 0 10px var(--neon-pink),
+        0 0 20px rgba(255, 0, 255, 0.6);
+}
+
+#highscore-display {
+    color: var(--neon-green);
+    text-shadow: 0 0 8px rgba(0, 255, 136, 0.6);
+    font-size: 24px;
+}
+
+#speed-display {
+    color: var(--neon-orange);
+    text-shadow: 0 0 12px var(--neon-orange);
+    min-width: 105px;
+    text-align: right;
+}
+
+#combo-display {
+    color: #fff;
+    text-shadow:
+        0 0 10px var(--neon-pink),
+        0 0 20px var(--neon-pink);
+    font-size: 34px;
+    transition: transform 0.12s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.combo-active {
+    transform: scale(1.35) rotate(-4deg);
+    color: var(--neon-orange) !important;
+}
+
+/* Escudo Temporário / Integridade */
+#shield-indicator {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.4);
+    transition: all 0.25s ease;
+}
+
+#shield-indicator.active {
+    border-color: var(--neon-green);
+    color: var(--neon-green);
+    background: rgba(0, 255, 136, 0.12);
+    box-shadow: 0 0 12px rgba(0, 255, 136, 0.45);
+}
+
+/* Botões rápidos no HUD (Som & Pausa) */
+.hud-actions {
+    display: flex;
+    gap: 8px;
+    pointer-events: auto;
+}
+
+.icon-btn {
+    background: var(--glass-bg);
+    border: 1.5px solid rgba(0, 255, 255, 0.6);
+    color: #fff;
+    width: 42px;
+    height: 42px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 16px;
+    padding: 0;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+    transition: all 0.2s ease;
+}
+
+.icon-btn:hover {
+    background: var(--neon-blue);
+    color: #000;
+    transform: translateY(-2px);
+}
+
+/* Capacitor de Fluxo & Barra de Plutónio */
+.flux-container {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.flux-box {
+    width: 40px;
+    height: 48px;
+    background: #0a0a12;
+    border: 2px solid #444;
+    border-radius: 6px;
+    position: relative;
+    box-shadow: inset 0 0 10px #000;
+    overflow: hidden;
+    transition:
+        border-color 0.3s,
+        box-shadow 0.3s;
+}
+
+.flux-ready {
+    border-color: var(--neon-orange);
+    box-shadow:
+        inset 0 0 10px var(--neon-orange),
+        0 0 14px var(--neon-orange);
+}
+
+.flux-active {
+    border-color: var(--neon-blue);
+    box-shadow:
+        inset 0 0 12px var(--neon-blue),
+        0 0 18px var(--neon-blue);
+}
+
+.flux-tube {
+    position: absolute;
+    background: #333;
+    border-radius: 4px;
+    transition: all 0.15s;
+}
+
+.flux-y {
+    width: 4px;
+    height: 16px;
+    bottom: 50%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+.flux-l {
+    width: 4px;
+    height: 18px;
+    top: 50%;
+    right: 50%;
+    transform-origin: top right;
+    transform: rotate(120deg);
+}
+.flux-r {
+    width: 4px;
+    height: 18px;
+    top: 50%;
+    left: 50%;
+    transform-origin: top left;
+    transform: rotate(-120deg);
+}
+
+.flux-ready .flux-tube {
+    background: var(--neon-orange);
+    box-shadow: 0 0 8px var(--neon-orange);
+}
+
+.flux-active .flux-tube {
+    background: #fff;
+    box-shadow:
+        0 0 8px var(--neon-blue),
+        0 0 16px #fff;
+    animation: fluxPulse 0.08s infinite alternate;
+}
+
+@keyframes fluxPulse {
+    from {
+        opacity: 0.6;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Barra de Carga de Plutónio / Overdrive */
+.overdrive-bar-wrap {
+    width: 110px;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 3px;
+    margin-top: 5px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+#overdrive-bar {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, var(--neon-orange), #ffee44);
+    box-shadow: 0 0 8px var(--neon-orange);
+    transition: width 0.08s linear;
+}
+
+/* Notificações Centrais & Callouts Flutuantes */
+#level-notification {
+    position: absolute;
+    top: 32%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: clamp(32px, 6vw, 68px);
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: 8px;
+    text-shadow:
+        0 0 20px #fff,
+        0 0 50px var(--neon-blue);
+    opacity: 0;
+    text-align: center;
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+.level-up-anim {
+    animation: timeJumpPulse 2.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes timeJumpPulse {
+    0% {
+        transform: translate(-50%, -50%) scale(0.2) skew(15deg);
+        opacity: 0;
+    }
+    15% {
+        transform: translate(-50%, -50%) scale(1.15) skew(0);
+        opacity: 1;
+    }
+    80% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(2.2);
+        opacity: 0;
+        filter: blur(12px);
+    }
+}
+
+#callout-banner {
+    position: absolute;
+    top: 42%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: clamp(16px, 2.8vw, 28px);
+    font-weight: 900;
+    letter-spacing: 3px;
+    color: var(--neon-green);
+    text-shadow:
+        0 0 14px var(--neon-green),
+        0 0 28px #000;
+    opacity: 0;
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+.callout-anim {
+    animation: calloutPop 0.95s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes calloutPop {
+    0% {
+        transform: translate(-50%, -20%) scale(0.7);
+        opacity: 0;
+    }
+    25% {
+        transform: translate(-50%, -50%) scale(1.12);
+        opacity: 1;
+    }
+    75% {
+        transform: translate(-50%, -65%) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -95%) scale(0.95);
+        opacity: 0;
+    }
+}
+
+#overdrive-warning {
+    position: absolute;
+    top: 19%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #fff;
+    font-size: clamp(18px, 3.6vw, 38px);
+    font-weight: 900;
+    letter-spacing: 5px;
+    text-shadow:
+        0 0 20px #ff3300,
+        0 0 40px #ff3300;
+    opacity: 0;
+    transition: opacity 0.2s;
+    text-align: center;
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+.overdrive-on {
+    opacity: 1 !important;
+    animation: overdrivePulse 0.08s infinite alternate;
+}
+
+@keyframes overdrivePulse {
+    from {
+        transform: translate(-50%, -50%) scale(1);
+    }
+    to {
+        transform: translate(-50%, -50%) scale(1.04);
+        text-shadow:
+            0 0 25px var(--neon-blue),
+            0 0 50px #fff;
+    }
+}
+
+/* Ecrãs de Menu (Início, Pausa, Game Over) */
+.screen {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(2, 0, 12, 0.82);
+    pointer-events: auto;
+    backdrop-filter: blur(12px);
+    transition:
+        opacity 0.4s ease,
+        visibility 0.4s ease;
+    z-index: 30;
+    padding: 20px;
+    text-align: center;
+}
+
+.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+h1 {
+    font-size: clamp(36px, 7vw, 76px);
+    margin: 0;
+    color: #fff;
+    text-shadow:
+        0 0 15px var(--neon-blue),
+        0 0 35px var(--neon-blue),
+        0 0 70px var(--neon-pink);
+    text-transform: uppercase;
+    letter-spacing: 6px;
+    line-height: 1.05;
+}
+
+h2 {
+    color: var(--neon-pink);
+    text-shadow: 0 0 15px var(--neon-pink);
+    margin: 10px 0 30px;
+    letter-spacing: 5px;
+    font-size: clamp(14px, 2.5vw, 22px);
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.primary-btn {
+    background: linear-gradient(135deg, rgba(0, 255, 255, 0.18), rgba(255, 0, 255, 0.18));
+    border: 2px solid var(--neon-blue);
+    color: #fff;
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(16px, 2.5vw, 22px);
+    font-weight: 900;
+    padding: 16px 46px;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    box-shadow:
+        0 0 18px rgba(0, 255, 255, 0.4) inset,
+        0 0 25px rgba(0, 255, 255, 0.4);
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border-radius: 8px;
+}
+
+.primary-btn:hover {
+    background: var(--neon-blue);
+    color: #02000a;
+    box-shadow: 0 0 35px var(--neon-blue);
+    transform: scale(1.06);
+}
+
+.primary-btn:active {
+    transform: scale(0.97);
+}
+
+.instruction-card {
+    font-size: clamp(11px, 1.5vw, 13.5px);
+    color: rgba(255, 255, 255, 0.85);
+    margin-top: 28px;
+    text-transform: uppercase;
+    letter-spacing: 1.4px;
+    line-height: 1.85;
+    background: rgba(10, 5, 25, 0.78);
+    padding: 18px 28px;
+    border-radius: 12px;
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    max-width: 600px;
+}
+
+.highlight {
+    color: var(--neon-pink);
+    font-weight: 800;
+    text-shadow: 0 0 6px rgba(255, 0, 255, 0.6);
+}
+
+.highlight-cyan {
+    color: var(--neon-blue);
+    font-weight: 800;
+    text-shadow: 0 0 6px rgba(0, 255, 255, 0.6);
+}
+
+.highlight-orange {
+    color: var(--neon-orange);
+    font-weight: 800;
+    text-shadow: 0 0 6px rgba(255, 170, 0, 0.6);
+}
+
+/* Estatísticas do Fim de Jogo */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-bottom: 30px;
+    background: rgba(10, 5, 25, 0.8);
+    border: 1px solid rgba(255, 0, 255, 0.4);
+    border-radius: 12px;
+    padding: 18px 25px;
+    width: 100%;
+    max-width: 520px;
+}
+
+.stat-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.stat-box span:first-child {
+    font-size: 10px;
+    color: var(--neon-blue);
+    letter-spacing: 1.5px;
+    margin-bottom: 4px;
+}
+
+.stat-box span:last-child {
+    font-family: 'VT323', monospace;
+    font-size: 28px;
+    color: #fff;
+    text-shadow: 0 0 8px #fff;
+}
+
+/* Controles Touch (Mobile) */
+#mobile-controls {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 44%;
+    display: none;
+    z-index: 25;
+    padding: 14px;
+    gap: 10px;
+    pointer-events: none;
+}
+
+@media (hover: none) and (pointer: coarse) {
+    #mobile-controls {
+        display: flex;
+    }
+}
+
+.touch-btn {
+    flex: 1;
+    height: 100%;
+    border: 1.5px dashed rgba(255, 255, 255, 0.2);
+    border-radius: 14px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 16px;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 18px;
+    font-weight: 700;
+    pointer-events: auto;
+    background: linear-gradient(to top, rgba(0, 255, 255, 0.05), transparent);
+    transition: all 0.1s;
+}
+
+.touch-btn:active {
+    background: linear-gradient(to top, rgba(0, 255, 255, 0.25), transparent);
+    border-color: var(--neon-blue);
+    color: var(--neon-blue);
+}
+
+.touch-center-col {
+    flex: 1.35;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    height: 100%;
+}
+
+.touch-jump {
+    flex: 1;
+    font-size: 16px;
+    text-align: center;
+    line-height: 1.2;
+    align-items: center;
+    padding-bottom: 0;
+}
+
+.touch-boost {
+    height: 36%;
+    font-size: 13px;
+    letter-spacing: 1px;
+    align-items: center;
+    padding-bottom: 0;
+    border-color: rgba(255, 170, 0, 0.35);
+    color: rgba(255, 170, 0, 0.6);
+}
+
+@media (max-width: 768px) {
+    #ui-layer {
+        padding: 12px;
+    }
+    .hud-panel {
+        padding: 8px 12px;
+        gap: 10px;
+    }
+    .hud-value {
+        font-size: 22px;
+    }
+    #highscore-display {
+        font-size: 18px;
+    }
+    .hud-label {
+        font-size: 9px;
+        letter-spacing: 1px;
+    }
+    .flux-box {
+        width: 28px;
+        height: 36px;
+    }
+    .flux-y {
+        height: 11px;
+    }
+    .flux-l,
+    .flux-r {
+        height: 13px;
+    }
+    .overdrive-bar-wrap {
+        width: 76px;
+    }
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+}
+
+.hud-element--combo {
+    text-align: right;
+    min-width: 55px;
+}
+
+.hud-element--right {
+    text-align: right;
+}
+
+.hud-cluster {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#flux-status {
+    color: #888;
+    font-size: 18px;
+}
+
+#level-display {
+    color: var(--neon-blue);
+}
+
+#pause-screen h1 {
+    font-size: clamp(32px, 6vw, 60px);
+}
+
+.button-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+#pause-restart-btn {
+    border-color: var(--neon-pink);
+}
+
+#game-over-screen h1 {
+    color: #fff;
+    text-shadow:
+        0 0 20px #ff0044,
+        0 0 50px #ff0044;
+}
+
+#new-record-badge {
+    color: var(--neon-green);
+    text-shadow: 0 0 12px var(--neon-green);
+}
+
+#unsupported-screen p {
+    max-width: 560px;
+    color: #ccc;
+    font-family: 'VT323', monospace;
+    font-size: 22px;
+    line-height: 1.4;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+.primary-btn:focus-visible,
+.icon-btn:focus-visible {
+    outline: 2px solid var(--neon-orange);
+    outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
