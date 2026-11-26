@@ -765,7 +765,10 @@
 
         let gameState = 'MENU'; // 'MENU', 'PLAYING', 'PAUSED', 'GAMEOVER'
         let score = 0;
-        let highScore = parseInt(localStorage.getItem('sunset_delorean_highscore') || '0', 10);
+        let highScore = 0;
+        try {
+            highScore = Math.max(0, parseInt(localStorage.getItem('sunset_delorean_highscore'), 10) || 0);
+        } catch {}
         let maxComboReached = 1;
         let timeJumpsCount = 0;
         let currentEraIndex = 0;
@@ -1697,11 +1700,13 @@
 
             window.addEventListener('keydown', e => {
                 if (e.key === 'p' || e.key === 'P' || e.key === 'Escape') {
+                    if (e.repeat) return;
                     if (gameState === 'PLAYING') pauseGame();
                     else if (gameState === 'PAUSED') resumeGame();
                     return;
                 }
                 if (e.key === 'm' || e.key === 'M') {
+                    if (e.repeat) return;
                     toggleMute();
                     return;
                 }
@@ -1717,12 +1722,14 @@
             });
 
             window.addEventListener('keyup', e => setMove(e.key, false));
+            window.addEventListener('blur', pauseGame);
 
             // Botões táteis dedicados
             const bindTouchBtn = (id, dir) => {
                 const el = document.getElementById(id);
                 el.addEventListener('touchstart', e => { e.preventDefault(); if (dir === 'l') moveLeft = true; else moveRight = true; }, { passive: false });
                 el.addEventListener('touchend', e => { e.preventDefault(); if (dir === 'l') moveLeft = false; else moveRight = false; }, { passive: false });
+                el.addEventListener('touchcancel', () => { if (dir === 'l') moveLeft = false; else moveRight = false; });
             };
             bindTouchBtn('touch-left', 'l');
             bindTouchBtn('touch-right', 'r');
@@ -1905,6 +1912,8 @@
 
         function pauseGame() {
             if (gameState !== 'PLAYING') return;
+            moveLeft = false;
+            moveRight = false;
             gameState = 'PAUSED';
             document.getElementById('pause-screen').classList.remove('hidden');
             if (engineGain && audioCtx) engineGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.05);
@@ -1952,7 +1961,7 @@
                 const finalPts = Math.floor(score);
                 if (finalPts > highScore) {
                     highScore = finalPts;
-                    localStorage.setItem('sunset_delorean_highscore', highScore.toString());
+                    try { localStorage.setItem('sunset_delorean_highscore', highScore.toString()); } catch {}
                     ui.highScore.innerText = highScore.toString().padStart(6, '0');
                     document.getElementById('new-record-badge').style.display = 'block';
                 }
