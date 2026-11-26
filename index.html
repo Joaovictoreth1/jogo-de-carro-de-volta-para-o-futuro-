@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="pt-PT">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <meta name="theme-color" content="#02000a" />
+        <meta name="color-scheme" content="dark" />
+        <meta name="referrer" content="strict-origin-when-cross-origin" />
+        <title>Sunset Race - DeLorean Time Machine 88 MPH</title>
+        <meta
+            name="description"
+            content="A derradeira experiência Synthwave 3D. Alcance as 88 MPH no icónico DeLorean com modo Hover, Plutónio, Near-Miss, trilha sonora procedural e viagens no tempo."
+        />
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <script type="module" src="/src/main.ts"></script>
+    </head>
+    <body>
+        <div id="game-container"></div>
+        <div id="vignette"></div>
+        <div id="crt-overlay"></div>
+        <div id="time-flash"></div>
+
+        <!-- Controles Táteis para Telemóveis/Tablets -->
+        <div id="mobile-controls" aria-hidden="true">
+            <div class="touch-btn" id="touch-left">◀</div>
+            <div class="touch-center-col">
+                <div class="touch-btn touch-jump" id="touch-jump">HOVER ▲</div>
+                <div class="touch-btn touch-boost" id="touch-boost">88 MPH ⚡</div>
+            </div>
+            <div class="touch-btn" id="touch-right">▶</div>
+        </div>
+
+        <!-- HUD Principal -->
+        <div id="ui-layer">
+            <div id="level-notification">2015 ERA</div>
+            <div id="callout-banner">NEAR MISS +150</div>
+            <div id="overdrive-warning">TIME TRAVEL: 88 MPH!!</div>
+
+            <div class="hud-top">
+                <div class="hud-panel">
+                    <div class="hud-element">
+                        <span class="hud-label">PONTUAÇÃO</span>
+                        <span class="hud-value" id="score-display">000000</span>
+                    </div>
+                    <div class="hud-element">
+                        <span class="hud-label">RECORDE</span>
+                        <span class="hud-value" id="highscore-display">000000</span>
+                    </div>
+                    <div class="hud-element hud-element--combo">
+                        <span class="hud-label">COMBO</span>
+                        <span class="hud-value" id="combo-display">x1</span>
+                    </div>
+                </div>
+
+                <div class="hud-cluster">
+                    <div class="hud-panel flux-container">
+                        <div class="hud-element hud-element--right">
+                            <span class="hud-label">PLUTÓNIO / FLUXO</span>
+                            <span class="hud-value" id="flux-status">0%</span>
+                            <div class="overdrive-bar-wrap">
+                                <div id="overdrive-bar"></div>
+                            </div>
+                        </div>
+                        <div class="flux-box" id="flux-capacitor">
+                            <div class="flux-tube flux-y"></div>
+                            <div class="flux-tube flux-l"></div>
+                            <div class="flux-tube flux-r"></div>
+                        </div>
+                    </div>
+
+                    <div class="hud-actions">
+                        <button
+                            type="button"
+                            class="icon-btn"
+                            id="mute-btn"
+                            title="Ativar/Desativar Som (M)"
+                            aria-label="Ativar/Desativar Som (M)"
+                            aria-pressed="false"
+                        >
+                            🔊
+                        </button>
+                        <button
+                            type="button"
+                            class="icon-btn"
+                            id="pause-btn"
+                            title="Pausar Jogo (P / ESC)"
+                            aria-label="Pausar Jogo (P / ESC)"
+                        >
+                            ⏸
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hud-bottom">
+                <div class="hud-panel">
+                    <div class="hud-element">
+                        <span class="hud-label">DESTINO TEMPORAL</span>
+                        <span class="hud-value" id="level-display">1985</span>
+                    </div>
+                    <div id="shield-indicator">🛡 ESCUDO</div>
+                </div>
+                <div class="hud-panel">
+                    <div class="hud-element">
+                        <span class="hud-label">VELOCÍMETRO</span>
+                        <span class="hud-value" id="speed-display">00 MPH</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ecrã Inicial -->
+        <div id="start-screen" class="screen">
+            <h1>Sunset Race</h1>
+            <h2>DeLorean Time Machine • 88 MPH</h2>
+            <button type="button" class="primary-btn" id="start-btn">INICIAR IGNIÇÃO</button>
+            <div class="instruction-card">
+                <span class="highlight">[A] / [D]</span> ou <span class="highlight">[Setas]</span> (ou deslizar) para
+                Conduzir<br />
+                <span class="highlight">[ESPAÇO] / [W] / [▲]</span> para ativar o
+                <span class="highlight-cyan">Modo Hover (Saltar)</span><br />
+                <span class="highlight-orange">[SHIFT] / [E]</span> quando o Plutónio atingir 100% para disparar
+                <span class="highlight-cyan">88 MPH</span>!<br />
+                Passe rente aos obstáculos (<span class="highlight">Near-Miss</span>) e apanhe
+                <span class="highlight-cyan">Escudos</span> para sobreviver!
+            </div>
+        </div>
+
+        <!-- Ecrã de Pausa -->
+        <div id="pause-screen" class="screen hidden">
+            <h1>TEMPO SUSPENSO</h1>
+            <h2>Simulação em Pausa</h2>
+            <div class="button-row">
+                <button type="button" class="primary-btn" id="resume-btn">RETOMAR</button>
+                <button type="button" class="primary-btn" id="pause-restart-btn">REINICIAR</button>
+            </div>
+        </div>
+
+        <!-- Ecrã de Game Over -->
+        <div id="game-over-screen" class="screen hidden">
+            <h1>FORA DO TEMPO</h1>
+            <h2 id="new-record-badge" hidden>★ NOVO RECORDE TEMPORAL ★</h2>
+
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <span>PONTUAÇÃO FINAL</span>
+                    <span id="final-score">0</span>
+                </div>
+                <div class="stat-box">
+                    <span>COMBO MÁXIMO</span>
+                    <span id="final-combo">x1</span>
+                </div>
+                <div class="stat-box">
+                    <span>SALTOS NO TEMPO</span>
+                    <span id="final-jumps">0</span>
+                </div>
+            </div>
+
+            <button type="button" class="primary-btn" id="restart-btn">NOVO SALTO TEMPORAL</button>
+        </div>
+
+        <!-- Ecrã de Incompatibilidade (sem WebGL) -->
+        <div id="unsupported-screen" class="screen" hidden>
+            <h1>Sem Sinal</h1>
+            <h2>WebGL indisponível</h2>
+            <p>
+                Este navegador ou dispositivo não suporta WebGL, necessário para renderizar o DeLorean. Ative a
+                aceleração por hardware ou abra o jogo num navegador moderno.
+            </p>
+        </div>
+    </body>
+</html>
