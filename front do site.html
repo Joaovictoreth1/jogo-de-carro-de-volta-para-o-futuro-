@@ -401,6 +401,50 @@
             pointer-events: none;
         }
 
+        .race-history {
+            width: min(100%, 29rem);
+            margin-top: 1rem;
+            padding: .65rem 1rem;
+            border: 1px solid var(--neon-blue);
+            border-radius: .75rem;
+            background: #100921;
+            color: #fff;
+            text-align: left;
+        }
+
+        .race-history summary {
+            cursor: pointer;
+            padding: .4rem 0;
+        }
+
+        .race-history ol {
+            padding-inline-start: 1.5rem;
+            margin: .5rem 0;
+        }
+
+        .race-history li {
+            margin-block: .35rem;
+        }
+
+        .screen {
+            overflow-y: auto;
+            justify-content: safe center;
+        }
+
+        .screen :focus-visible {
+            outline: 3px solid #fff;
+            outline-offset: 4px;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            #time-flash {
+                display: none;
+            }
+            .screen {
+                transition: none;
+            }
+        }
+
         h1 {
             font-size: clamp(36px, 7vw, 76px);
             margin: 0;
@@ -699,6 +743,12 @@
             <span class="highlight-orange">[SHIFT] / [E]</span> quando o Plutónio atingir 100% para disparar <span class="highlight-cyan">88 MPH</span>!<br>
             Passe rente aos obstáculos (<span class="highlight">Near-Miss</span>) e apanhe <span class="highlight-cyan">Escudos</span> para sobreviver!
         </div>
+        <details class="race-history">
+            <summary>Últimas corridas</summary>
+            <p id="race-history-empty">Ainda não há corridas completas.</p>
+            <ol id="race-history"></ol>
+            <p id="race-history-status" role="status"></p>
+        </details>
     </div>
 
     <!-- Ecrã de Pausa -->
@@ -732,6 +782,11 @@
         </div>
 
         <button class="primary-btn" id="restart-btn">NOVO SALTO TEMPORAL</button>
+        <details class="race-history">
+            <summary>Últimas corridas</summary>
+            <ol id="finished-race-history"></ol>
+            <p id="finished-history-status" role="status"></p>
+        </details>
     </div>
 
     <script type="module">
@@ -739,6 +794,7 @@
         import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
         import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
         import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+        import { addRace, readRaces, saveRaces } from './race-history.mjs';
 
         // ============================================================================
         // 1. CONFIGURAÇÃO DE ERAS TEMPORAIS (Paletas de Cores & Atmosfera)
@@ -765,7 +821,35 @@
 
         let gameState = 'MENU'; // 'MENU', 'PLAYING', 'PAUSED', 'GAMEOVER'
         let score = 0;
-        let highScore = parseInt(localStorage.getItem('sunset_delorean_highscore') || '0', 10);
+        let highScore = 0;
+        try {
+            highScore = Math.max(0, parseInt(localStorage.getItem('sunset_delorean_highscore'), 10) || 0);
+        } catch {}
+        const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
+        const raceStorage = {
+            getItem: key => localStorage.getItem(key),
+            setItem: (key, value) => localStorage.setItem(key, value),
+        };
+        const storedRaces = readRaces(raceStorage);
+        let recentRaces = storedRaces.races;
+        let historyAvailable = storedRaces.available;
+
+        function renderRaceHistory() {
+            for (const id of ['race-history', 'finished-race-history']) {
+                const list = document.getElementById(id);
+                list.replaceChildren();
+                for (const race of recentRaces) {
+                    const row = document.createElement('li');
+                    const pts = race.points.toLocaleString('pt-PT');
+                    row.textContent = `${pts} pontos · combo ×${race.combo} · ${race.jumps} ${race.jumps === 1 ? 'salto' : 'saltos'}`;
+                    list.append(row);
+                }
+            }
+            document.getElementById('race-history-empty').hidden = recentRaces.length > 0;
+            const status = historyAvailable ? '' : 'Histórico indisponível no armazenamento; novas corridas ficam só nesta aba.';
+            document.getElementById('race-history-status').textContent = status;
+            document.getElementById('finished-history-status').textContent = status;
+        }
         let maxComboReached = 1;
         let timeJumpsCount = 0;
         let currentEraIndex = 0;
@@ -1696,12 +1780,15 @@
             };
 
             window.addEventListener('keydown', e => {
+                if (e.defaultPrevented || e.target instanceof HTMLElement && e.target.closest('input, select, textarea, summary')) return;
                 if (e.key === 'p' || e.key === 'P' || e.key === 'Escape') {
+                    if (e.repeat) return;
                     if (gameState === 'PLAYING') pauseGame();
                     else if (gameState === 'PAUSED') resumeGame();
                     return;
                 }
                 if (e.key === 'm' || e.key === 'M') {
+                    if (e.repeat) return;
                     toggleMute();
                     return;
                 }
@@ -1717,12 +1804,14 @@
             });
 
             window.addEventListener('keyup', e => setMove(e.key, false));
+            window.addEventListener('blur', pauseGame);
 
             // Botões táteis dedicados
             const bindTouchBtn = (id, dir) => {
                 const el = document.getElementById(id);
                 el.addEventListener('touchstart', e => { e.preventDefault(); if (dir === 'l') moveLeft = true; else moveRight = true; }, { passive: false });
                 el.addEventListener('touchend', e => { e.preventDefault(); if (dir === 'l') moveLeft = false; else moveRight = false; }, { passive: false });
+                el.addEventListener('touchcancel', () => { if (dir === 'l') moveLeft = false; else moveRight = false; });
             };
             bindTouchBtn('touch-left', 'l');
             bindTouchBtn('touch-right', 'r');
@@ -1905,6 +1994,8 @@
 
         function pauseGame() {
             if (gameState !== 'PLAYING') return;
+            moveLeft = false;
+            moveRight = false;
             gameState = 'PAUSED';
             document.getElementById('pause-screen').classList.remove('hidden');
             if (engineGain && audioCtx) engineGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.05);
@@ -1950,9 +2041,12 @@
                 if (engineGain && audioCtx) engineGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.05);
 
                 const finalPts = Math.floor(score);
+                recentRaces = addRace(recentRaces, { points: finalPts, combo: maxComboReached, jumps: timeJumpsCount });
+                historyAvailable = saveRaces(raceStorage, recentRaces);
+                renderRaceHistory();
                 if (finalPts > highScore) {
                     highScore = finalPts;
-                    localStorage.setItem('sunset_delorean_highscore', highScore.toString());
+                    try { localStorage.setItem('sunset_delorean_highscore', highScore.toString()); } catch {}
                     ui.highScore.innerText = highScore.toString().padStart(6, '0');
                     document.getElementById('new-record-badge').style.display = 'block';
                 }
@@ -1962,6 +2056,7 @@
                     document.getElementById('final-combo').innerText = `x${maxComboReached}`;
                     document.getElementById('final-jumps').innerText = timeJumpsCount;
                     document.getElementById('game-over-screen').classList.remove('hidden');
+                    document.getElementById('restart-btn').focus();
                 }, 1700);
             }
         }
@@ -2280,18 +2375,20 @@
                 camera.position.x += (camTargetX - camera.position.x) * 0.12 * dt;
 
                 let shakeX = 0, shakeY = 0;
-                if (screenShake > 0) {
+                if (reduceMotion.matches) {
+                    screenShake = 0;
+                } else if (screenShake > 0) {
                     shakeX = (Math.random() - 0.5) * screenShake;
                     shakeY = (Math.random() - 0.5) * screenShake;
                     screenShake *= Math.pow(0.86, dt);
                     if (screenShake < 0.04) screenShake = 0;
                 }
-                const speedVibration = (speed > 5.5 && !isJumping) ? (Math.random() - 0.5) * 0.14 : 0;
+                const speedVibration = (!reduceMotion.matches && speed > 5.5 && !isJumping) ? (Math.random() - 0.5) * 0.14 : 0;
 
                 camera.position.y = 5.4 + (isJumping ? car.position.y * 0.42 : 0) + shakeY + speedVibration;
                 camera.position.x += shakeX;
                 camera.lookAt(camTargetX * 0.25, 2.4 + (isJumping ? car.position.y * 0.48 : 0), -65);
-                camera.rotation.z = -carVelocityX * 0.045;
+                camera.rotation.z = reduceMotion.matches ? 0 : -carVelocityX * 0.045;
             }
 
             // Partículas de Explosão
@@ -2322,6 +2419,7 @@
             composer.render();
         }
 
+        renderRaceHistory();
         window.onload = initGraphics;
     </script>
 </body>
